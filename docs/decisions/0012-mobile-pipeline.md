@@ -20,9 +20,9 @@ The phone records a meeting, transcribes it, and extracts a summary. The job sto
 
 ### Job state changes added
 
-- `queued → retryable` (`waitForMac`): routing chose to wait for the paired Mac. It is not an attempt, so it does not count toward the retry limit.
-- `queued → failed`: routing found nowhere to run the job, for example no speech model.
-- `processing → retryable` with no delay (`escalate`): the phone result can't be used, and routing decides the next step.
+- `queued` to `retryable` (`waitForMac`): routing chose to wait for the paired Mac. It is not an attempt, so it does not count toward the retry limit.
+- `queued` to `failed`: routing found nowhere to run the job, for example no speech model.
+- `processing` to `retryable` with no delay (`escalate`): the phone result can't be used, and routing decides the next step.
 
 ### Failure handling
 

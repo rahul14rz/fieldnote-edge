@@ -217,6 +217,26 @@ adb pull $W/results/. benchmarks/results/raw/oneplus-11r/
    cp "$W"/results/* benchmarks/results/raw/macbook-air-m4/
    ```
 
+## Measure the Mac arm and the hybrid arm
+
+The phone-only arm is the LLM timing run on the OnePlus 11R above. For the Mac-only arm, run the same prompt set against the Mac's model server.
+
+1. Start a model server on the Mac that implements `POST /v1/chat/completions`, with the Gemma 4 build you are testing (for example a GGUF from `google/gemma-4-12B-it-qat-q4_0-gguf` in llama.cpp's `llama-server`). Check that the server honors `top_k`.
+2. Run the Mac arm:
+
+   ```bash
+   pnpm --filter @fieldnote/harness mac-arm --url http://127.0.0.1:8080/v1 --model <model name> --output "$PWD/benchmarks/results/raw/macbook-air-m4/mac-arm.json"
+   ```
+
+3. While it runs, record the model server's peak memory with `footprint <server process name>` or Activity Monitor, and the thermal state with `pmset -g therm` before and after.
+4. Combine one phone timing run and the Mac run into the three arms:
+
+   ```bash
+   pnpm --filter @fieldnote/harness hybrid --phone "$PWD/benchmarks/results/raw/oneplus-11r/<runId>.json" --mac "$PWD/benchmarks/results/raw/macbook-air-m4/mac-arm.json" --output "$PWD/benchmarks/results/raw/hybrid.json"
+   ```
+
+   Add `--max-words N` once ADR 0001's gates give a phone size limit.
+
 ## Compute the numbers
 
 1. Summarize the timing and memory results:

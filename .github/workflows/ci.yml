@@ -82,6 +82,21 @@ jobs:
           dart analyze
           dart test
 
+  harness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @fieldnote/harness test
+
   mobile:
     runs-on: ubuntu-latest
     strategy:
