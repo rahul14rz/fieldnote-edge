@@ -7,14 +7,24 @@ import { EnvError, parseEnv } from "../src/env.js";
 
 describe("parseEnv", () => {
   it("defaults to loopback so the gateway is not on the LAN before pairing exists", () => {
-    expect(parseEnv({})).toEqual({ HOST: "127.0.0.1", PORT: 8787, LOG_LEVEL: "info" });
+    expect(parseEnv({})).toEqual({
+      HOST: "127.0.0.1",
+      PORT: 8787,
+      LOG_LEVEL: "info",
+      DATA_DIR: "./data",
+      INFERENCE_BACKEND: "none",
+    });
   });
 
   it("reads explicit values", () => {
-    expect(parseEnv({ HOST: "0.0.0.0", PORT: "9000", LOG_LEVEL: "debug" })).toEqual({
+    expect(
+      parseEnv({ HOST: "0.0.0.0", PORT: "9000", LOG_LEVEL: "debug", DATA_DIR: "/var/fieldnote" }),
+    ).toEqual({
       HOST: "0.0.0.0",
       PORT: 9000,
       LOG_LEVEL: "debug",
+      DATA_DIR: "/var/fieldnote",
+      INFERENCE_BACKEND: "none",
     });
   });
 
@@ -22,6 +32,7 @@ describe("parseEnv", () => {
     ["PORT", "not-a-number"],
     ["PORT", "70000"],
     ["LOG_LEVEL", "loud"],
+    ["INFERENCE_BACKEND", "magic"],
   ])("rejects %s=%s and names the variable", (name, value) => {
     expect(() => parseEnv({ [name]: value })).toThrow(EnvError);
     expect(() => parseEnv({ [name]: value })).toThrow(name);

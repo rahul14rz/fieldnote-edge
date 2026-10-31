@@ -27,3 +27,6 @@ benchmarks/results/raw/
 
 # Library package lockfile (apps commit theirs)
 packages/contracts/dart/pubspec.lock
+
+# Gateway data
+services/gateway/data/
