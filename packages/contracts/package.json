@@ -11,7 +11,8 @@
     "generate": "node scripts/generate.mjs",
     "check": "node scripts/generate.mjs --check",
     "typecheck": "tsc -p tsconfig.json",
-    "test": "vitest run"
+    "test": "vitest run",
+    "validate-outputs": "node scripts/validate-outputs.mjs"
   },
   "devDependencies": {
     "@types/node": "^22.20.5",
