@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/rahul14rz/fieldnote-edge/contracts/pairing-request.schema.json",
+  "title": "PairingRequest",
+  "description": "Body of POST /v1/pairing: the phone redeems a one-time pairing code.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "code",
+    "deviceName"
+  ],
+  "properties": {
+    "code": {
+      "type": "string",
+      "pattern": "^[0-9A-HJKMNP-TV-Z]{10}$",
+      "description": "Ten Crockford base32 characters shown on the Mac."
+    },
+    "deviceName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    }
+  }
+}

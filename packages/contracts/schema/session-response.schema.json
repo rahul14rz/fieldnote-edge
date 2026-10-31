@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/rahul14rz/fieldnote-edge/contracts/session-response.schema.json",
+  "title": "SessionResponse",
+  "description": "A session token for the Authorization header (Bearer). It expires at expiresAt.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "sessionToken",
+    "expiresAt"
+  ],
+  "properties": {
+    "sessionToken": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{43}$",
+      "description": "32 random bytes, base64url without padding."
+    },
+    "expiresAt": {
+      "type": "string",
+      "description": "UTC, ISO 8601."
+    }
+  }
+}
