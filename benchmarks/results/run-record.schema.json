@@ -1,0 +1,393 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/rahul14rz/fieldnote-edge/benchmarks/results/run-record.schema.json",
+  "title": "SpikeRunRecord",
+  "description": "One result file written by apps/spike (results/<runId>.json). schemaVersion 1.",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "runId",
+    "startedAt",
+    "finishedAt",
+    "device",
+    "packages",
+    "config",
+    "model",
+    "mode"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "runId": {
+      "type": "string"
+    },
+    "startedAt": {
+      "type": "string",
+      "description": "UTC, ISO 8601."
+    },
+    "finishedAt": {
+      "type": "string",
+      "description": "UTC, ISO 8601."
+    },
+    "device": {
+      "type": "object",
+      "required": [
+        "label",
+        "os",
+        "osVersion",
+        "processors"
+      ],
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "os": {
+          "type": "string"
+        },
+        "osVersion": {
+          "type": "string"
+        },
+        "processors": {
+          "type": "integer"
+        }
+      }
+    },
+    "packages": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "config": {
+      "type": "object",
+      "description": "Copy of spike_config.json as run."
+    },
+    "model": {
+      "type": "object",
+      "required": [
+        "requestedBackend",
+        "activeBackend",
+        "loadMs",
+        "memoryBeforeLoad",
+        "memoryAfterLoad"
+      ],
+      "properties": {
+        "requestedBackend": {
+          "enum": [
+            "cpu",
+            "gpu"
+          ]
+        },
+        "activeBackend": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Backend the engine reports it loaded. Null for Whisper, which does not report one."
+        },
+        "loadMs": {
+          "type": "number",
+          "description": "Install from file plus model load."
+        },
+        "memoryBeforeLoad": {
+          "type": "object",
+          "required": [
+            "anonymousBytes",
+            "fileBackedBytes",
+            "anonymousPeakBytes",
+            "maxRssBytes"
+          ],
+          "properties": {
+            "anonymousBytes": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "fileBackedBytes": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "anonymousPeakBytes": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "maxRssBytes": {
+              "type": "integer"
+            }
+          }
+        },
+        "memoryAfterLoad": {
+          "type": "object",
+          "required": [
+            "anonymousBytes",
+            "fileBackedBytes",
+            "anonymousPeakBytes",
+            "maxRssBytes"
+          ],
+          "properties": {
+            "anonymousBytes": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "fileBackedBytes": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "anonymousPeakBytes": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "maxRssBytes": {
+              "type": "integer"
+            }
+          }
+        }
+      }
+    },
+    "mode": {
+      "enum": [
+        "llm",
+        "asr"
+      ]
+    },
+    "promptSetVersion": {
+      "type": "string"
+    },
+    "runs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "caseId",
+          "repetition",
+          "warmup",
+          "promptTokens",
+          "timeToFirstTokenMs",
+          "endToEndMs",
+          "firstToLastChunkMs",
+          "outputTokens",
+          "chunks",
+          "decodeTokensPerSecond",
+          "memory",
+          "output"
+        ],
+        "properties": {
+          "caseId": {
+            "type": "string"
+          },
+          "repetition": {
+            "type": "integer"
+          },
+          "warmup": {
+            "type": "boolean"
+          },
+          "promptTokens": {
+            "type": "integer"
+          },
+          "timeToFirstTokenMs": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "endToEndMs": {
+            "type": "number"
+          },
+          "firstToLastChunkMs": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "outputTokens": {
+            "type": "integer"
+          },
+          "chunks": {
+            "type": "integer"
+          },
+          "decodeTokensPerSecond": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "memory": {
+            "type": "object",
+            "required": [
+              "sampledMaxAnonymousBytes",
+              "sampledMaxFileBackedBytes",
+              "anonymousPeakBytes",
+              "maxRssBytes",
+              "samples"
+            ],
+            "properties": {
+              "sampledMaxAnonymousBytes": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "sampledMaxFileBackedBytes": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "anonymousPeakBytes": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "maxRssBytes": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "samples": {
+                "type": "integer"
+              }
+            }
+          },
+          "output": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "language",
+          "decodeLanguage",
+          "audioSeconds",
+          "windows",
+          "elapsedMs",
+          "realTimeFactor",
+          "memory",
+          "text"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "language": {
+            "enum": [
+              "en",
+              "ta",
+              "ml",
+              "hi",
+              "ta-en",
+              "ml-en",
+              "hi-en"
+            ]
+          },
+          "decodeLanguage": {
+            "type": "string"
+          },
+          "audioSeconds": {
+            "type": "number"
+          },
+          "windows": {
+            "type": "integer"
+          },
+          "elapsedMs": {
+            "type": "number"
+          },
+          "realTimeFactor": {
+            "type": "number"
+          },
+          "memory": {
+            "type": "object",
+            "required": [
+              "sampledMaxAnonymousBytes",
+              "sampledMaxFileBackedBytes",
+              "anonymousPeakBytes",
+              "maxRssBytes",
+              "samples"
+            ],
+            "properties": {
+              "sampledMaxAnonymousBytes": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "sampledMaxFileBackedBytes": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "anonymousPeakBytes": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "maxRssBytes": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "samples": {
+                "type": "integer"
+              }
+            }
+          },
+          "text": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "mode": {
+            "const": "llm"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "promptSetVersion",
+          "runs"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "mode": {
+            "const": "asr"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "results"
+        ]
+      }
+    }
+  ]
+}

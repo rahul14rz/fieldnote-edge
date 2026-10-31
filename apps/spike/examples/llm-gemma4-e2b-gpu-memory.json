@@ -1,0 +1,13 @@
+{
+  "deviceLabel": "OnePlus 11R",
+  "mode": "llm",
+  "memorySampleIntervalMs": 1000,
+  "llm": {
+    "modelId": "gemma-4-E2B-it",
+    "modelFile": "models/gemma-4-E2B-it.litertlm",
+    "backend": "gpu",
+    "contextTokens": 4096,
+    "repetitions": 3,
+    "warmupRuns": 1
+  }
+}

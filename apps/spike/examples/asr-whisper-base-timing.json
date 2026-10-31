@@ -1,0 +1,23 @@
+{
+  "deviceLabel": "OnePlus 11R",
+  "mode": "asr",
+  "memorySampleIntervalMs": 0,
+  "asr": {
+    "engine": "whisper",
+    "modelId": "whisper-base-30s-i8",
+    "modelFile": "models/whisper_base_30s_i8.tflite",
+    "tokenizerFile": "models/whisper-base-tokenizer.json",
+    "backend": "cpu",
+    "manifest": "asr/manifest.jsonl",
+    "windowSeconds": 30,
+    "decodeLanguage": {
+      "en": "en",
+      "ta": "ta",
+      "ml": "ml",
+      "hi": "hi",
+      "ta-en": "ta",
+      "ml-en": "ml",
+      "hi-en": "hi"
+    }
+  }
+}

@@ -1,0 +1,27 @@
+name: fieldnote_spike
+description: "Milestone 0 measurement app: on-device LLM and ASR timing and memory."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.13.7
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_edge_ai: ^2.5.4
+  flutter_edge_ai_diagnostics: ^0.5.0
+  flutter_edge_ai_litertlm: ^1.19.0
+  flutter_edge_ai_speech: ^0.5.12
+  path_provider: ^2.1.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/prompt_set.json
+    - assets/meeting-summary.schema.json
