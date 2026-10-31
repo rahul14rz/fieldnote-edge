@@ -24,3 +24,6 @@ benchmarks/results/raw/
 .DS_Store
 .vscode/
 .claude/settings.local.json
+
+# Library package lockfile (apps commit theirs)
+packages/contracts/dart/pubspec.lock
