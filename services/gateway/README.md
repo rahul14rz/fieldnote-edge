@@ -5,10 +5,11 @@ The gateway is a Fastify and TypeScript service that runs on the Mac. In a later
 Implemented so far:
 
 - `GET /health` returns the `HealthResponse` contract from `packages/contracts`.
+- A job API for summarize jobs: `POST /v1/jobs`, `GET /v1/jobs/:jobId` and `GET /v1/jobs/:jobId/summary`. Submits are idempotent on the job ID. Jobs are stored in SQLite and survive a restart. Every model answer is validated against `MeetingSummary`. [ADR 0008](../../docs/decisions/0008-gateway-job-api.md) has the status codes and failure kinds.
 - Startup validates the environment and exits with code 1, naming the bad variable, if a value is invalid.
 - Logs are structured JSON (pino). Each request log line carries a `correlationId`. The gateway takes the ID from the `x-request-id` request header if the header matches `^[A-Za-z0-9._-]{1,64}$`, otherwise it generates a UUID, and it returns the ID in the `x-request-id` response header.
 
-Not implemented yet: inference, pairing, TLS, job processing.
+Not implemented yet: a real inference backend (`INFERENCE_BACKEND=none` is the only value, so `POST /v1/jobs` answers 503), pairing, and TLS.
 
 ## Environment
 
@@ -17,6 +18,8 @@ Not implemented yet: inference, pairing, TLS, job processing.
 | `HOST` | `127.0.0.1` | Any interface address |
 | `PORT` | `8787` | 0 to 65535 |
 | `LOG_LEVEL` | `info` | `fatal`, `error`, `warn`, `info`, `debug`, `trace`, `silent` |
+| `DATA_DIR` | `./data` | Directory for `gateway.sqlite` |
+| `INFERENCE_BACKEND` | `none` | `none` |
 
 By default the gateway listens only on loopback. Pairing and TLS don't exist yet, so binding to the LAN would expose an unauthenticated service.
 
@@ -57,4 +60,4 @@ pnpm --filter @fieldnote/gateway typecheck
 pnpm --filter @fieldnote/gateway test
 ```
 
-The `/health` tests start the server on a real socket (port 0) and call it with `fetch`. The startup test runs `src/server.ts` with `PORT=not-a-number` and asserts that it exits with code 1.
+The tests start the server on a real socket (port 0) with a fresh SQLite file and call it with `fetch`. The job tests use a scripted backend. They cover the full flow, invalid answers, idempotent resubmits, the requeue after a backend error, and a restart that reruns a job left `processing`. The startup test runs `src/server.ts` with `PORT=not-a-number` and asserts that it exits with code 1.

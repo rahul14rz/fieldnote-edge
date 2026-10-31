@@ -11,8 +11,8 @@ flowchart LR
     asr["On-device ASR<br/>flutter_edge_ai_speech<br/>(planned)"]
     llm["On-device extraction<br/>Gemma 4 E2B<br/>(planned)"]
     val["Validate against<br/>MeetingSummary schema<br/>(planned)"]
-    route["Routing policy, Dart<br/>deterministic<br/>(planned)"]
-    jobs[("Durable job store<br/>(planned)")]
+    route["Routing policy, Dart<br/>deterministic<br/>(built, not wired)"]
+    jobs[("Durable job store<br/>(built, not wired)")]
     rec --> jobs
     jobs --> route
     route -->|on device| asr --> llm --> val
@@ -22,8 +22,8 @@ flowchart LR
 
   subgraph mac["Mac: gateway (services/gateway)"]
     health["GET /health<br/>(built)"]
-    api["Job API<br/>(planned)"]
-    big["Larger Gemma model<br/>(planned, model not chosen)"]
+    api["Job API, SQLite<br/>(built, no model yet)"]
+    big["Gemma 4 12B candidate<br/>(planned, not measured)"]
     api --> big
   end
 
@@ -43,11 +43,11 @@ The phone app is built with Flutter for Android and macOS. iOS is out of scope, 
 
 ### Routing policy (planned, in the app)
 
-The routing policy is a Dart function of the task type, the input size, the validation result, whether the Mac is paired and reachable, and the user's settings. It is deterministic. Historical accuracy is not an input. The gateway never makes routing decisions. See [ADR 0002](decisions/0002-routing-in-the-app.md).
+The routing policy (`apps/mobile/lib/src/routing/routing_policy.dart`) is a Dart function of the task type, the input size, the validation result, whether the Mac is paired and reachable, and the user's settings. It is deterministic. Historical accuracy is not an input. The gateway never makes routing decisions. See [ADR 0002](decisions/0002-routing-in-the-app.md).
 
 ### Gateway (`services/gateway`)
 
-The gateway is a Fastify and TypeScript service on the Mac. Today it serves `GET /health`, validates its environment at startup, and writes structured JSON logs with a correlation ID per request. It listens only on loopback until pairing exists ([ADR 0006](decisions/0006-gateway-binds-loopback-until-pairing.md)).
+The gateway is a Fastify and TypeScript service on the Mac. It serves `GET /health` and an idempotent job API backed by SQLite ([ADR 0008](decisions/0008-gateway-job-api.md)), validates its environment at startup, and writes structured JSON logs with a correlation ID per request. No model runs on it yet. It listens only on loopback until pairing exists ([ADR 0006](decisions/0006-gateway-binds-loopback-until-pairing.md)).
 
 ### Contracts (`packages/contracts`)
 
