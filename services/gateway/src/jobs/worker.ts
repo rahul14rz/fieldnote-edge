@@ -70,6 +70,7 @@ export class JobWorker {
   private async drain(): Promise<void> {
     for (let job = this.store.claimNext(); job; job = this.store.claimNext()) {
       const { jobId } = job.status;
+      const { deviceId } = job;
       const log = this.log.child({ correlationId: jobId, attempt: job.status.attempts });
       let answer: string;
       try {
@@ -77,15 +78,15 @@ export class JobWorker {
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         log.warn({ err: message }, "inference backend failed");
-        this.store.fail(jobId, "backend_error", message);
+        this.store.fail(deviceId, jobId, "backend_error", message);
         continue;
       }
       const parsed = parseSummary(answer);
       if (parsed.ok) {
-        this.store.complete(jobId, parsed.summary);
+        this.store.complete(deviceId, jobId, parsed.summary);
         log.info("job completed");
       } else {
-        this.store.fail(jobId, "invalid_output", parsed.reason);
+        this.store.fail(deviceId, jobId, "invalid_output", parsed.reason);
         log.info({ reason: parsed.reason }, "model output failed validation");
       }
     }
