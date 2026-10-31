@@ -108,7 +108,7 @@ flutter test
 
 Device runs follow [docs/spike/RUNBOOK.md](docs/spike/RUNBOOK.md).
 
-No Android or macOS build of either app has been run on a device. A macOS build needs a Mac, and the development container has no Mac and no phone.
+`flutter build apk --release --target-platform android-arm64` succeeded for `apps/spike` in the development container (59.5 MB, `minSdkVersion` 30, LiteRT libraries for `arm64-v8a`). Neither app has been run on a device, and no macOS build has been made, because the container has no phone and no Mac.
 
 ### Evaluation
 

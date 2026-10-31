@@ -15,7 +15,7 @@ Versions come from the pub.dev API (`https://pub.dev/api/packages/<name>`). Requ
 | [`flutter_edge_ai_speech`](https://pub.dev/packages/flutter_edge_ai_speech) | 0.5.12 | 2026-10-28 | `>=3.12.0 <4.0.0` | `>=3.44.0` |
 | [`flutter_edge_ai_diagnostics`](https://pub.dev/packages/flutter_edge_ai_diagnostics) | 0.5.0 | 2026-10-25 | `>=3.12.0 <4.0.0` | `>=3.44.0` |
 
-`flutter_edge_ai_litertlm` 1.19.0 depends on `flutter_edge_ai: ^2.5.4`. `flutter_edge_ai_speech` 0.5.12 depends on `flutter_edge_ai: ^2.3.0` and `flutter_edge_ai_litertlm: ^1.13.0`. `flutter_edge_ai_diagnostics` has no dependency on the other three. `apps/spike` resolves all four at the versions in the table with Flutter 3.47.9 (Dart 3.13.7), as recorded in `apps/spike/pubspec.lock`.
+`flutter_edge_ai_litertlm` 1.19.0 depends on `flutter_edge_ai: ^2.5.4`. `flutter_edge_ai_speech` 0.5.12 depends on `flutter_edge_ai: ^2.3.0` and `flutter_edge_ai_litertlm: ^1.13.0`. `flutter_edge_ai_diagnostics` has no dependency on the other three. `apps/spike` resolves all four at the versions in the table with Flutter 3.47.9 (Dart 3.13.7), as recorded in `apps/spike/pubspec.lock`. `flutter build apk --release --target-platform android-arm64` succeeded on Linux with Android SDK platform 36. The APK has `minSdkVersion` 30 and contains `libLiteRtLm.so`, `libLiteRtOpenClAccelerator.so`, `libLiteRtTopKOpenClSampler.so` and `libGemmaModelConstraintProvider.so` for `arm64-v8a`. A build is not a run: whether the model loads on the OnePlus 11R is not yet measured. No macOS build was possible without a Mac.
 
 ### Requirements that were already known: confirmed
 

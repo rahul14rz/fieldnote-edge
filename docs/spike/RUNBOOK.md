@@ -68,7 +68,7 @@ Aim for at least 10 minutes of audio per language. That is a proposal, not a mea
 
    ```bash
    cd apps/spike
-   flutter build apk --release
+   flutter build apk --release --target-platform android-arm64
    adb install -r build/app/outputs/flutter-apk/app-release.apk
    cd -
    ```
