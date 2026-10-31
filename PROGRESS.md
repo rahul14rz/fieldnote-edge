@@ -42,4 +42,4 @@ Started on 2026-11-01 at the user's request, in parallel with the device measure
 | Pairing, session tokens, revocation, per-device jobs | done on the gateway and the phone | [ADR 0009](docs/decisions/0009-pairing-and-sessions.md) |
 | TLS 1.3 with a pinned self-signed certificate, pairing proofs | done on the gateway and the phone | [ADR 0010](docs/decisions/0010-tls-and-pinned-pairing.md) |
 | mDNS discovery | done; tested on Linux, not on a phone | [ADR 0011](docs/decisions/0011-mac-inference-backend-and-mdns.md) |
-| Phone-only, Mac-only and hybrid evaluation harness | not started | |
+| Phone-only, Mac-only and hybrid evaluation harness | done; not run on devices or a real model server | [benchmarks/harness](benchmarks/harness) |

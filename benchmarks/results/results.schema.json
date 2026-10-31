@@ -43,7 +43,8 @@
           "backend": {
             "enum": [
               "cpu",
-              "gpu"
+              "gpu",
+              "server"
             ]
           },
           "activeBackend": {

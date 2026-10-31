@@ -59,6 +59,24 @@ One row per device, engine and language. WER and CER come from `python3 -m asr_e
 
 Add MacBook Air M4 rows in the same shape if you run ASR on the Mac.
 
+## Phone only, Mac only and hybrid
+
+From `pnpm --filter @fieldnote/harness hybrid`. Times exclude network transfer between the phone and the Mac.
+
+| Case | Arm | Runs | Median end-to-end (ms) | Valid share | Escalated share |
+| --- | --- | --- | --- | --- | --- |
+| en-short | phone-only | not yet measured | not yet measured | not yet measured | |
+| en-short | mac-only | not yet measured | not yet measured | not yet measured | |
+| en-short | hybrid | not yet measured | not yet measured | not yet measured | not yet measured |
+| en-long | phone-only | not yet measured | not yet measured | not yet measured | |
+| en-long | mac-only | not yet measured | not yet measured | not yet measured | |
+| en-long | hybrid | not yet measured | not yet measured | not yet measured | not yet measured |
+| ta-en-short | phone-only | not yet measured | not yet measured | not yet measured | |
+| ta-en-short | mac-only | not yet measured | not yet measured | not yet measured | |
+| ta-en-short | hybrid | not yet measured | not yet measured | not yet measured | not yet measured |
+
+Add the remaining cases in the same shape.
+
 ## Go/no-go
 
 Fill in the go/no-go table in [`docs/spike/RUNBOOK.md`](../../docs/spike/RUNBOOK.md#fill-in-the-gono-go-table), and copy the completed table here.

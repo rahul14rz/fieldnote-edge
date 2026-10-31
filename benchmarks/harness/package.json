@@ -1,0 +1,17 @@
+{
+  "name": "@fieldnote/harness",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "mac-arm": "node src/mac-arm.mjs",
+    "hybrid": "node src/hybrid.mjs",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "ajv": "^8.20.0"
+  },
+  "devDependencies": {
+    "vitest": "^5.0.5"
+  }
+}
