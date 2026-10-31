@@ -12,7 +12,18 @@ Implemented so far:
 - Pairing and session tokens ([ADR 0009](../../docs/decisions/0009-pairing-and-sessions.md)). Every `/v1/jobs` request needs `Authorization: Bearer <session token>`.
 - HTTPS only, TLS 1.3, with a self-signed certificate created on first start in `$DATA_DIR/tls/`. Pairing proofs bind the code to the certificate fingerprint ([ADR 0010](../../docs/decisions/0010-tls-and-pinned-pairing.md)).
 
-Not implemented yet: a real inference backend (`INFERENCE_BACKEND=none` is the only value, so `POST /v1/jobs` answers 503), and mDNS discovery.
+- Inference through any local server that implements the OpenAI chat completions API, with greedy decoding ([ADR 0011](../../docs/decisions/0011-mac-inference-backend-and-mdns.md)). Without a backend, `POST /v1/jobs` answers 503.
+- mDNS advertising of `_fieldnote._tcp` when the gateway listens beyond loopback.
+
+## Serve the phone
+
+Start a model server that implements `POST /v1/chat/completions`, for example llama.cpp's `llama-server` or Ollama, with the Gemma 4 build you measured. Then start the gateway on the LAN:
+
+```bash
+HOST=0.0.0.0 INFERENCE_BACKEND=openai-compatible INFERENCE_URL=http://127.0.0.1:8080/v1 INFERENCE_MODEL=<model name> node services/gateway/dist/src/server.js
+```
+
+The model server URL and name above are placeholders for your setup. No model server was run in this repository's development environment.
 
 ## Environment
 
@@ -22,7 +33,12 @@ Not implemented yet: a real inference backend (`INFERENCE_BACKEND=none` is the o
 | `PORT` | `8787` | 0 to 65535 |
 | `LOG_LEVEL` | `info` | `fatal`, `error`, `warn`, `info`, `debug`, `trace`, `silent` |
 | `DATA_DIR` | `./data` | Directory for `gateway.sqlite` |
-| `INFERENCE_BACKEND` | `none` | `none` |
+| `INFERENCE_BACKEND` | `none` | `none`, or `openai-compatible` for a local model server |
+| `INFERENCE_URL` | none | Base URL ending in `/v1`, required with `openai-compatible` |
+| `INFERENCE_MODEL` | none | Model name the server expects, required with `openai-compatible` |
+| `INFERENCE_TIMEOUT_MS` | `600000` | Positive integer |
+| `INFERENCE_MAX_OUTPUT_TOKENS` | `2048` | Positive integer |
+| `MDNS` | `auto` | `auto` (advertise only beyond loopback), `on`, `off` |
 
 By default the gateway listens only on loopback. Pairing and TLS don't exist yet, so binding to the LAN would expose an unauthenticated service.
 
