@@ -39,5 +39,6 @@ Started on 2026-11-01 at the user's request, in parallel with the device measure
 | Gateway job API with idempotent submits and SQLite storage | done, no inference backend | [ADR 0008](docs/decisions/0008-gateway-job-api.md) |
 | Mac inference backend (Gemma 4 12B candidate) | not started; waits for Mac measurements | |
 | Phone recording, transcription and extraction pipeline | not started; waits for the go/no-go table | |
-| mDNS discovery, pairing, TLS with pinning, revocation | not started | [docs/security.md](docs/security.md) |
+| Pairing, session tokens, revocation, per-device jobs (gateway) | done; phone side not started | [ADR 0009](docs/decisions/0009-pairing-and-sessions.md) |
+| TLS with certificate pinning, mDNS discovery | not started | [docs/security.md](docs/security.md) |
 | Phone-only, Mac-only and hybrid evaluation harness | not started | |
