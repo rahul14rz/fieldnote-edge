@@ -4,12 +4,24 @@ enum JobKind { transcribe, summarize }
 /// Where a job runs. The routing policy chooses it; see routing_policy.dart.
 enum Placement { phone, mac }
 
+/// What happened the last time this job ran on the phone. Routing reads it.
+enum PhoneOutcome { notTried, invalidOutput, error }
+
 /// The durable job states from docs/failure-handling.md.
 enum JobState { queued, processing, completed, retryable, failed, cancelled }
 
 /// Allowed state changes. Anything not listed throws [IllegalTransition].
+///
+/// A queued job can become retryable (it waits for the paired Mac) or failed
+/// (it can't run anywhere) without running, because routing decides that
+/// before any work starts.
 const _allowed = <JobState, Set<JobState>>{
-  JobState.queued: {JobState.processing, JobState.cancelled},
+  JobState.queued: {
+    JobState.processing,
+    JobState.retryable,
+    JobState.failed,
+    JobState.cancelled,
+  },
   JobState.processing: {
     JobState.completed,
     JobState.retryable,
@@ -38,10 +50,12 @@ class Job {
     required this.id,
     required this.kind,
     required this.inputPath,
+    required this.language,
     required this.state,
     required this.attempts,
     required this.createdAt,
     required this.updatedAt,
+    this.phoneOutcome = PhoneOutcome.notTried,
     this.placement,
     this.notBefore,
     this.resultPath,
@@ -52,11 +66,13 @@ class Job {
     required String id,
     required JobKind kind,
     required String inputPath,
+    required String language,
     required DateTime now,
   }) => Job(
     id: id,
     kind: kind,
     inputPath: inputPath,
+    language: language,
     state: JobState.queued,
     attempts: 0,
     createdAt: now,
@@ -68,12 +84,16 @@ class Job {
 
   /// Recording (transcribe) or transcript (summarize) on local storage.
   final String inputPath;
+
+  /// Language code chosen when recording: en, ta, ml, hi, ta-en, ml-en, hi-en.
+  final String language;
   final JobState state;
 
   /// Number of times the job entered [JobState.processing].
   final int attempts;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final PhoneOutcome phoneOutcome;
 
   /// Where the current or last attempt ran.
   final Placement? placement;
@@ -91,16 +111,19 @@ class Job {
     DateTime? notBefore,
     String? resultPath,
     String? lastError,
+    PhoneOutcome? phoneOutcome,
   }) {
     if (!_allowed[state]!.contains(next)) throw IllegalTransition(state, next);
     return Job(
       id: id,
       kind: kind,
       inputPath: inputPath,
+      language: language,
       state: next,
       attempts: attempts ?? this.attempts,
       createdAt: createdAt,
       updatedAt: now,
+      phoneOutcome: phoneOutcome ?? this.phoneOutcome,
       placement: placement ?? this.placement,
       notBefore: notBefore,
       resultPath: resultPath ?? this.resultPath,
@@ -130,7 +153,27 @@ class Job {
           notBefore: now.add(policy.delayAfter(attempts)),
         );
 
-  /// A failure a retry will not fix, such as unreadable audio.
+  /// The phone ran the job and the result can't be used. The job is
+  /// immediately runnable again, and routing sends it to the Mac if it can.
+  Job escalate(PhoneOutcome outcome, String reason, DateTime now) => _to(
+    JobState.retryable,
+    now,
+    phoneOutcome: outcome,
+    lastError: reason,
+    notBefore: now,
+  );
+
+  /// Routing chose to wait for the paired Mac. Not an attempt, so it does not
+  /// count toward the retry limit.
+  Job waitForMac(String reason, DateTime now, Duration delay) => _to(
+    JobState.retryable,
+    now,
+    lastError: reason,
+    notBefore: now.add(delay),
+  );
+
+  /// A failure a retry will not fix, such as unreadable audio, or routing
+  /// finding nowhere to run the job.
   Job failPermanent(String reason, DateTime now) =>
       _to(JobState.failed, now, lastError: reason);
 
@@ -142,10 +185,12 @@ class Job {
     'id': id,
     'kind': kind.name,
     'inputPath': inputPath,
+    'language': language,
     'state': state.name,
     'attempts': attempts,
     'createdAt': createdAt.toUtc().toIso8601String(),
     'updatedAt': updatedAt.toUtc().toIso8601String(),
+    'phoneOutcome': phoneOutcome.name,
     'placement': placement?.name,
     'notBefore': notBefore?.toUtc().toIso8601String(),
     'resultPath': resultPath,
@@ -159,10 +204,12 @@ class Job {
       id: json['id']! as String,
       kind: JobKind.values.byName(json['kind']! as String),
       inputPath: json['inputPath']! as String,
+      language: json['language']! as String,
       state: JobState.values.byName(json['state']! as String),
       attempts: json['attempts']! as int,
       createdAt: time('createdAt')!,
       updatedAt: time('updatedAt')!,
+      phoneOutcome: PhoneOutcome.values.byName(json['phoneOutcome']! as String),
       placement: json['placement'] == null
           ? null
           : Placement.values.byName(json['placement']! as String),

@@ -7,8 +7,19 @@ environment:
   sdk: ^3.13.7
 
 dependencies:
+  fieldnote_contracts:
+    path: ../../packages/contracts/dart
+  fieldnote_gateway_client:
+    path: ../../packages/gateway_client
   flutter:
     sdk: flutter
+  flutter_edge_ai: ^2.5.4
+  flutter_edge_ai_litertlm: ^1.19.0
+  flutter_edge_ai_speech: ^0.5.12
+  flutter_secure_storage: ^11.2.0
+  json_schema: ^5.2.2
+  path_provider: ^2.1.6
+  record: ^7.1.2
 
 dev_dependencies:
   flutter_test:
@@ -17,3 +28,6 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/meeting-summary.schema.json
+    - assets/summarize-prompt.txt

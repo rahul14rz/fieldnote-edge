@@ -10,7 +10,7 @@ RoutingInput input({
   PhoneOutcome last = PhoneOutcome.notTried,
   bool allowMac = true,
   RoutingThresholds thresholds = const RoutingThresholds(
-    maxPhoneTranscriptTokens: 1000,
+    maxPhoneTranscriptWords: 1000,
     maxPhoneAudioSeconds: 600,
   ),
 }) => RoutingInput(
@@ -34,7 +34,7 @@ Iterable<RoutingInput> everyInput() sync* {
               for (final thresholds in const [
                 RoutingThresholds(),
                 RoutingThresholds(
-                  maxPhoneTranscriptTokens: 1000,
+                  maxPhoneTranscriptWords: 1000,
                   maxPhoneAudioSeconds: 1000,
                 ),
               ]) {

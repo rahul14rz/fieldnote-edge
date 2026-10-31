@@ -28,5 +28,13 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Fieldnote records meetings so they can be transcribed on this device.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Fieldnote finds and talks to your paired Mac gateway on the local network.</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_fieldnote._tcp</string>
+	</array>
 </dict>
 </plist>
