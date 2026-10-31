@@ -1,0 +1,22 @@
+{
+  "deviceLabel": "OnePlus 11R",
+  "mode": "asr",
+  "memorySampleIntervalMs": 0,
+  "asr": {
+    "engine": "gemmaAudio",
+    "modelId": "gemma-4-E2B-it",
+    "modelFile": "models/gemma-4-E2B-it.litertlm",
+    "backend": "gpu",
+    "manifest": "asr/manifest.jsonl",
+    "windowSeconds": 30,
+    "decodeLanguage": {
+      "en": "English",
+      "ta": "Tamil",
+      "ml": "Malayalam",
+      "hi": "Hindi",
+      "ta-en": "Tamil and English",
+      "ml-en": "Malayalam and English",
+      "hi-en": "Hindi and English"
+    }
+  }
+}

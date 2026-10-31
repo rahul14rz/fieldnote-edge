@@ -1,0 +1,29 @@
+# Node
+node_modules/
+dist/
+coverage/
+*.log
+
+# Dart / Flutter
+.dart_tool/
+build/
+.flutter-plugins-dependencies
+*.iml
+.idea/
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Benchmark runs: raw audio and device logs stay local
+benchmarks/datasets/local/
+benchmarks/results/raw/
+
+# OS / editor
+.DS_Store
+.vscode/
+.claude/settings.local.json
+
+# Library package lockfile (apps commit theirs)
+packages/contracts/dart/pubspec.lock

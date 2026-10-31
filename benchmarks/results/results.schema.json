@@ -1,0 +1,232 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/rahul14rz/fieldnote-edge/benchmarks/results/results.schema.json",
+  "title": "BenchmarkResults",
+  "description": "Filled-in results for one measurement round. summarize_runs.py produces the measured fields; the user adds osPeakMemoryBytes, thermal, wer and cer. A null value means not yet measured.",
+  "type": "object",
+  "required": [
+    "llm",
+    "asr"
+  ],
+  "properties": {
+    "normalizer": {
+      "const": "fieldnote-v1"
+    },
+    "llm": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "device",
+          "model",
+          "backend",
+          "activeBackend",
+          "promptSetVersion",
+          "caseId",
+          "runs",
+          "medianLoadMs",
+          "medianTimeToFirstTokenMs",
+          "medianDecodeTokensPerSecond",
+          "medianEndToEndMs",
+          "peakAnonymousBytes",
+          "peakFileBackedBytes",
+          "peakMaxRssBytes"
+        ],
+        "properties": {
+          "device": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          },
+          "backend": {
+            "enum": [
+              "cpu",
+              "gpu"
+            ]
+          },
+          "activeBackend": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "promptSetVersion": {
+            "type": "string"
+          },
+          "caseId": {
+            "type": "string"
+          },
+          "runs": {
+            "type": "integer"
+          },
+          "medianLoadMs": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "medianTimeToFirstTokenMs": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "medianDecodeTokensPerSecond": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "medianEndToEndMs": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "peakAnonymousBytes": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "peakFileBackedBytes": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "peakMaxRssBytes": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "osPeakMemoryBytes": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "From dumpsys meminfo TOTAL PSS (Android) or footprint (macOS), recorded by hand. Null means not yet measured."
+          },
+          "thermalBefore": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Android: dumpsys thermalservice 'Thermal Status' value. macOS: pmset -g therm summary. Null means not yet measured."
+          },
+          "thermalAfter": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Android: dumpsys thermalservice 'Thermal Status' value. macOS: pmset -g therm summary. Null means not yet measured."
+          }
+        }
+      }
+    },
+    "asr": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "device",
+          "model",
+          "engine",
+          "backend",
+          "language",
+          "files",
+          "audioSeconds",
+          "realTimeFactor",
+          "peakAnonymousBytes",
+          "peakMaxRssBytes"
+        ],
+        "properties": {
+          "device": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          },
+          "engine": {
+            "enum": [
+              "whisper",
+              "gemmaAudio"
+            ]
+          },
+          "backend": {
+            "enum": [
+              "cpu",
+              "gpu"
+            ]
+          },
+          "language": {
+            "enum": [
+              "en",
+              "ta",
+              "ml",
+              "hi",
+              "ta-en",
+              "ml-en",
+              "hi-en"
+            ]
+          },
+          "files": {
+            "type": "integer"
+          },
+          "audioSeconds": {
+            "type": "number"
+          },
+          "realTimeFactor": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "peakAnonymousBytes": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "peakMaxRssBytes": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "wer": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "From python3 -m asr_eval, normalizer fieldnote-v1."
+          },
+          "cer": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "thermalBefore": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Android: dumpsys thermalservice 'Thermal Status' value. macOS: pmset -g therm summary. Null means not yet measured."
+          },
+          "thermalAfter": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Android: dumpsys thermalservice 'Thermal Status' value. macOS: pmset -g therm summary. Null means not yet measured."
+          }
+        }
+      }
+    }
+  }
+}

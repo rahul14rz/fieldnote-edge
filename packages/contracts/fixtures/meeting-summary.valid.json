@@ -1,0 +1,31 @@
+{
+  "participants": [
+    {
+      "name": "Priya",
+      "role": "Procurement, Acme Foods"
+    },
+    {
+      "name": "Arun",
+      "role": null
+    }
+  ],
+  "topics": [
+    "Revised quote for cold-storage units",
+    "Delivery schedule"
+  ],
+  "decisions": [
+    "Proceed with the 12-unit option"
+  ],
+  "actionItems": [
+    {
+      "description": "Send the revised quote",
+      "owner": "Arun",
+      "dueDate": "2026-11-06"
+    },
+    {
+      "description": "Confirm the delivery address",
+      "owner": null,
+      "dueDate": null
+    }
+  ]
+}

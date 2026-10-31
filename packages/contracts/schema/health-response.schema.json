@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/rahul14rz/fieldnote-edge/contracts/health-response.schema.json",
+  "title": "HealthResponse",
+  "description": "Body of GET /health on the Mac gateway.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["status", "service", "version"],
+  "properties": {
+    "status": { "type": "string", "enum": ["ok"] },
+    "service": { "type": "string", "enum": ["fieldnote-gateway"] },
+    "version": { "type": "string", "description": "Gateway package version." }
+  }
+}

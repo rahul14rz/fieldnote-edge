@@ -1,0 +1,62 @@
+{
+  "version": "2026-10-31.1",
+  "note": "Fictional, scripted transcripts written for timing measurements. They are not real meetings and are not a quality benchmark.",
+  "template": "You extract structured notes from meeting transcripts.\nReturn only one JSON object that is valid against this JSON Schema. Do not add any text before or after it.\nUse null for an owner or due date that the transcript does not state. Write dueDate as YYYY-MM-DD only if a calendar date can be determined, otherwise null.\nKeep names and quoted terms in the language and script used in the transcript.\n\nJSON Schema:\n{schema}\n\nTranscript:\n{transcript}\n",
+  "cases": [
+    {
+      "id": "en-short",
+      "transcriptParts": [
+        "en-visit-1"
+      ],
+      "maxOutputTokens": 512
+    },
+    {
+      "id": "en-medium",
+      "transcriptParts": [
+        "en-visit-1",
+        "en-visit-2"
+      ],
+      "maxOutputTokens": 768
+    },
+    {
+      "id": "en-long",
+      "transcriptParts": [
+        "en-visit-1",
+        "en-visit-2",
+        "en-visit-3",
+        "en-visit-4"
+      ],
+      "maxOutputTokens": 1024
+    },
+    {
+      "id": "hi-en-short",
+      "transcriptParts": [
+        "hi-en-visit-1"
+      ],
+      "maxOutputTokens": 512
+    },
+    {
+      "id": "ta-en-short",
+      "transcriptParts": [
+        "ta-en-visit-1"
+      ],
+      "maxOutputTokens": 512
+    },
+    {
+      "id": "ml-en-short",
+      "transcriptParts": [
+        "ml-en-visit-1"
+      ],
+      "maxOutputTokens": 512
+    }
+  ],
+  "transcripts": {
+    "en-visit-1": "Arun: Thanks for making time, Priya. I wanted to walk through the revised quote for the cold-storage units.\nPriya: Sure. Last time the main concern was the delivery schedule. Our new outlet in Coimbatore opens on the fifteenth of December.\nArun: Understood. With the twelve-unit option we can deliver in two batches, eight units in the last week of November and four in the first week of December.\nPriya: That works if installation is included. Who handles installation on our side?\nArun: Our technician, Meena, will coordinate with your facilities team. I will send you her contact details today.",
+    "en-visit-2": "Priya: Good. On pricing, finance asked whether the annual maintenance contract can be split into quarterly payments.\nArun: I think so, but I need to confirm with our accounts team. I will get back to you by Wednesday.\nPriya: Also, can the units log temperatures to our existing dashboard? We use a cloud system from another vendor.\nArun: The units export CSV over USB today. A direct integration would be a separate project. Let us not include it in this order.\nPriya: Agreed, keep it out of scope for now. We can revisit it in the new year.",
+    "en-visit-3": "Ravi: Sorry I am late. Priya, did you raise the power backup question?\nPriya: Not yet. Arun, our Coimbatore site has frequent power cuts. How long do the units hold temperature without power?\nArun: The spec sheet says six hours with the door closed, but that was measured in a lab. I would not promise that for a busy store.\nRavi: Then we need a generator connection. I will ask our electrician to check the site load before the first delivery.\nArun: Please share the electrician's findings with Meena so she can plan the wiring.",
+    "en-visit-4": "Priya: Let me summarise. We go ahead with the twelve-unit option, delivered in two batches. Installation is included.\nArun: Yes. I will send the revised quote with the delivery dates by Friday, and Meena's contact details today.\nPriya: I need to get purchase approval from our director, Suresh. He is travelling, so it may take a week.\nRavi: I will get the electrician's report before the first batch arrives.\nArun: One open point is the quarterly payment option. I will confirm that by Wednesday. Anything else?\nPriya: No, that covers it. Thank you, Arun.",
+    "hi-en-visit-1": "Neha: Rahul, कल वाली meeting में हमने delivery timeline discuss की थी, उसका update क्या है?\nRahul: Vendor ने confirm किया है कि पहला shipment अगले Monday तक आ जाएगा।\nNeha: ठीक है। Invoice कौन भेजेगा?\nRahul: Invoice मैं भेज दूँगा, शुक्रवार तक।\nNeha: और training session का क्या? Team को नई billing system सीखनी है।\nRahul: Training अगले महीने रखते हैं, date मैं बाद में बताऊँगा।",
+    "ta-en-visit-1": "Karthik: Divya, நேத்து client meeting எப்படி போச்சு?\nDivya: நல்லா போச்சு. அவங்க revised proposal கேட்டாங்க, pricing கொஞ்சம் குறைக்கணும்னு சொன்னாங்க.\nKarthik: சரி, proposal யாரு அனுப்புவாங்க?\nDivya: நான் அனுப்புறேன், வியாழக்கிழமைக்குள்ள.\nKarthik: Demo-வ அடுத்த வாரம் வச்சுக்கலாமா?\nDivya: சரி, Tuesday morning fix பண்ணலாம். நான் calendar invite அனுப்புறேன்.",
+    "ml-en-visit-1": "Anoop: Sreeja, ഇന്നലത്തെ site visit എങ്ങനെ ഉണ്ടായിരുന്നു?\nSreeja: നന്നായി. അവർക്ക് പുതിയ quotation വേണം, installation charges കുറയ്ക്കാൻ പറഞ്ഞു.\nAnoop: Quotation ആരാണ് അയക്കുന്നത്?\nSreeja: ഞാൻ അയക്കാം, തിങ്കളാഴ്ചക്കുള്ളിൽ.\nAnoop: Final decision എപ്പോഴാണ്?\nSreeja: അവരുടെ manager അടുത്ത ആഴ്ച തീരുമാനിക്കും എന്നാണ് പറഞ്ഞത്."
+  }
+}

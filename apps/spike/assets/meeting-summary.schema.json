@@ -1,0 +1,95 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/rahul14rz/fieldnote-edge/contracts/meeting-summary.schema.json",
+  "title": "MeetingSummary",
+  "description": "Structured summary extracted from one transcribed meeting or customer visit.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "participants",
+    "topics",
+    "decisions",
+    "actionItems"
+  ],
+  "properties": {
+    "participants": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Participant"
+      }
+    },
+    "topics": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "actionItems": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ActionItem"
+      }
+    }
+  },
+  "definitions": {
+    "Participant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "role"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "role": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Role or organization if stated in the meeting, otherwise null."
+        }
+      }
+    },
+    "ActionItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "description",
+        "owner",
+        "dueDate"
+      ],
+      "properties": {
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Person responsible, or null if the meeting did not name one."
+        },
+        "dueDate": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "description": "ISO 8601 date (YYYY-MM-DD), or null if no deadline was stated."
+        }
+      }
+    }
+  }
+}
