@@ -8,6 +8,7 @@ import 'package:flutter_edge_ai_speech/flutter_edge_ai_speech.dart';
 
 import 'asr_benchmark.dart';
 import 'config.dart';
+import 'gemma_asr_prompt.dart';
 import 'llm_benchmark.dart';
 import 'memory.dart';
 import 'wav.dart';
@@ -97,17 +98,13 @@ class WhisperTranscriber implements Transcriber {
       recognizer.transcribe(pcm, language: language);
 }
 
-/// Sends each audio window to Gemma as a WAV attachment and asks for a
-/// verbatim transcript. A new chat per window keeps windows independent.
+/// Sends each audio window to Gemma as a WAV attachment with the model
+/// card's ASR prompt. The model card limits audio to 30 seconds per input.
+/// A new chat per window keeps windows independent.
 class GemmaAudioTranscriber implements Transcriber {
   GemmaAudioTranscriber(this.model);
 
   final InferenceModel model;
-
-  static const instruction =
-      'Transcribe this audio verbatim, in the language and script that is spoken. '
-      'If speakers switch languages, keep each word in the language it was spoken in. '
-      'Output only the transcript.';
 
   @override
   Future<String> transcribe(Uint8List pcm, {required String language}) async {
@@ -119,7 +116,7 @@ class GemmaAudioTranscriber implements Transcriber {
     try {
       await chat.addQueryChunk(
         Message(
-          text: '$instruction Language hint: $language.',
+          text: gemmaAsrPrompt(language),
           isUser: true,
           audioBytes: wavFromPcm(pcm),
         ),

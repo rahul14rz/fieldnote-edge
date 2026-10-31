@@ -152,7 +152,7 @@ The app records `anonymousBytes` and `fileBackedBytes` from `flutter_edge_ai_dia
 3. Repeat with `asr-gemma4-audio-timing.json` for the Gemma audio arm.
 4. For memory, run the same configs with `"memorySampleIntervalMs": 1000` and the `dumpsys meminfo` loop from the previous section.
 
-The example configs decode code-switched audio with the base language (`ta-en` uses `ta`). To compare, copy a config, change `decodeLanguage` for that pair to `en`, and run it again.
+The Whisper config decodes code-switched audio with the base language code (`ta-en` uses `ta`). To compare, copy it, change `decodeLanguage` for that pair to `en`, and run it again. The Gemma config uses language names instead, such as `Tamil and English`, because the model card's ASR prompt names the language.
 
 ### Copy the results to the Mac
 
