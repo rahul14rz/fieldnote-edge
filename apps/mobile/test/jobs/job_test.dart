@@ -8,6 +8,7 @@ void main() {
     id: 'j1',
     kind: JobKind.transcribe,
     inputPath: 'rec/1.wav',
+    language: 'en',
     now: t0,
   );
   const policy = RetryPolicy(

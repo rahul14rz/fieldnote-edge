@@ -1,0 +1,10 @@
+You extract structured notes from meeting transcripts.
+Return only one JSON object that is valid against this JSON Schema. Do not add any text before or after it.
+Use null for an owner or due date that the transcript does not state. Write dueDate as YYYY-MM-DD only if a calendar date can be determined, otherwise null.
+Keep names and quoted terms in the language and script used in the transcript.
+
+JSON Schema:
+{schema}
+
+Transcript:
+{transcript}

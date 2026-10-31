@@ -31,7 +31,7 @@ Milestone 1 started before the go/no-go table was filled in, at the user's reque
 
 - The phone is the default. A job the phone can run never waits for the Mac, so the app stays useful when the Mac is off.
 - An oversized job runs on the phone when the Mac is not online. The phone result can still be validated, and an invalid result then follows the second row.
-- The size limits (`maxPhoneAudioSeconds`, `maxPhoneTranscriptTokens`) are null until the spike measures what the phone handles. A null limit never moves a job.
+- The size limits (`maxPhoneAudioSeconds`, `maxPhoneTranscriptWords`) are null until the spike measures what the phone handles. A null limit never moves a job.
 - The function reads nothing but its input. Tests check the decisions above and four invariants over every input combination: same input gives the same route; nothing goes to or waits for the Mac when Mac use is off or no Mac is paired; a job goes to the Mac only when it is online; and a first attempt with a ready phone model always runs somewhere.
 
 ## Consequences

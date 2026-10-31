@@ -3,20 +3,17 @@ import '../jobs/job.dart';
 /// Whether the Mac gateway can take a job right now.
 enum MacStatus { unpaired, pairedOffline, online }
 
-/// What happened the last time this job ran on the phone.
-enum PhoneOutcome { notTried, invalidOutput, error }
-
 /// Size limits above which a job goes to the Mac when it can. A null limit
 /// is not set: Milestone 0 has not measured what the phone can handle, and
 /// no limit is invented before it does (ADR 0001).
 class RoutingThresholds {
   const RoutingThresholds({
     this.maxPhoneAudioSeconds,
-    this.maxPhoneTranscriptTokens,
+    this.maxPhoneTranscriptWords,
   });
 
   final int? maxPhoneAudioSeconds;
-  final int? maxPhoneTranscriptTokens;
+  final int? maxPhoneTranscriptWords;
 }
 
 class RoutingInput {
@@ -32,7 +29,7 @@ class RoutingInput {
 
   final JobKind kind;
 
-  /// Audio seconds for [JobKind.transcribe], transcript tokens for
+  /// Audio seconds for [JobKind.transcribe], transcript words for
   /// [JobKind.summarize].
   final int inputSize;
 
@@ -101,7 +98,7 @@ Route route(RoutingInput input) {
 
   final limit = switch (input.kind) {
     JobKind.transcribe => input.thresholds.maxPhoneAudioSeconds,
-    JobKind.summarize => input.thresholds.maxPhoneTranscriptTokens,
+    JobKind.summarize => input.thresholds.maxPhoneTranscriptWords,
   };
   if (limit != null &&
       input.inputSize > limit &&

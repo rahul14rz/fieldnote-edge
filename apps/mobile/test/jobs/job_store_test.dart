@@ -13,6 +13,7 @@ void main() {
     id: id,
     kind: JobKind.summarize,
     inputPath: 't/$id.txt',
+    language: 'en',
     now: at(createdSecond),
   );
 
