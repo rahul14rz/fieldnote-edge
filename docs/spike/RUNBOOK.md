@@ -23,7 +23,7 @@ pnpm install
 
 ## Download the models
 
-Download the files on the Mac into `benchmarks/datasets/local/models/`, which git ignores. The URLs come from the flutter_edge_ai 2.5.4 documentation. They were not opened during the spike, so check the file names on each Hugging Face page first.
+Download the files on the Mac into `benchmarks/datasets/local/models/`, which git ignores. The URLs come from the flutter_edge_ai 2.5.4 documentation. On 2026-11-01 the Hugging Face API listed all three files, and the repositories are not gated.
 
 ```bash
 mkdir -p benchmarks/datasets/local/models
@@ -34,7 +34,7 @@ curl -L -o whisper-base-tokenizer.json https://huggingface.co/openai/whisper-bas
 cd -
 ```
 
-Before you use each model, read its license on its Hugging Face page and record it in `docs/spike/findings.md`.
+The licenses are recorded in `docs/spike/findings.md`: Apache 2.0 for Gemma 4 E2B and for the Whisper LiteRT files.
 
 ## Prepare the speech recordings
 

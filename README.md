@@ -126,7 +126,7 @@ Nothing below is built unless it is marked **built**.
 
 ### Milestone 0: feasibility spike
 
-- **built.** Package, model and license findings with sources: [docs/spike/findings.md](docs/spike/findings.md). Several model and dataset licenses are still unverified.
+- **built.** Package, model and license findings with sources: [docs/spike/findings.md](docs/spike/findings.md). Some dataset licenses are still unverified.
 - **built.** Spike app that records time to first token, decode tokens per second, end-to-end latency and memory to JSON.
 - **built.** WER and CER evaluator that keeps Indic vowel signs.
 - **built.** Results template, results schemas, run summarizer, and output validator.
