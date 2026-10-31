@@ -9,7 +9,9 @@ Implemented so far:
 - Startup validates the environment and exits with code 1, naming the bad variable, if a value is invalid.
 - Logs are structured JSON (pino). Each request log line carries a `correlationId`. The gateway takes the ID from the `x-request-id` request header if the header matches `^[A-Za-z0-9._-]{1,64}$`, otherwise it generates a UUID, and it returns the ID in the `x-request-id` response header.
 
-Not implemented yet: a real inference backend (`INFERENCE_BACKEND=none` is the only value, so `POST /v1/jobs` answers 503), pairing, and TLS.
+- Pairing and session tokens ([ADR 0009](../../docs/decisions/0009-pairing-and-sessions.md)). Every `/v1/jobs` request needs `Authorization: Bearer <session token>`.
+
+Not implemented yet: a real inference backend (`INFERENCE_BACKEND=none` is the only value, so `POST /v1/jobs` answers 503), TLS, and mDNS discovery.
 
 ## Environment
 
@@ -50,6 +52,23 @@ Expected response:
 ```json
 {"status":"ok","service":"fieldnote-gateway","version":"0.0.0"}
 ```
+
+## Pair a device
+
+Build the gateway first. Then, on the Mac:
+
+```bash
+node services/gateway/dist/src/cli.js pair
+```
+
+The command prints a 10-character code that works once, for 5 minutes. List paired devices, and revoke one:
+
+```bash
+node services/gateway/dist/src/cli.js devices
+node services/gateway/dist/src/cli.js revoke <deviceId>
+```
+
+The CLI and the server must use the same `DATA_DIR`.
 
 ## Checks
 

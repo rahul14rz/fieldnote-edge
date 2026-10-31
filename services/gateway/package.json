@@ -11,7 +11,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc -p tsconfig.json",
-    "test": "vitest run"
+    "test": "vitest run",
+    "cli": "node dist/src/cli.js"
   },
   "dependencies": {
     "@fieldnote/contracts": "workspace:*",
@@ -29,5 +30,8 @@
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.72.1",
     "vitest": "^5.0.5"
+  },
+  "bin": {
+    "fieldnote-gateway": "dist/src/cli.js"
   }
 }

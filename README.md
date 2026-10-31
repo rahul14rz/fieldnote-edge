@@ -142,7 +142,8 @@ Nothing below is built unless it is marked **built**.
 - not built: recording
 - not built: on-device transcription and summary extraction
 - not built: gateway inference with the larger Gemma model
-- not built: mDNS discovery, pairing, session credentials, TLS with certificate pinning, and revocation ([docs/security.md](docs/security.md))
+- **built.** Pairing codes, device credentials, 15-minute session tokens and revocation on the gateway ([ADR 0009](docs/decisions/0009-pairing-and-sessions.md)). The phone side is not built.
+- not built: TLS with certificate pinning and mDNS discovery ([docs/security.md](docs/security.md))
 - not built: phone-only, Mac-only and hybrid evaluation harness
 
 ## License

@@ -89,3 +89,52 @@ export interface Participant {
      */
     role: null | string;
 }
+
+/**
+ * Body of POST /v1/pairing: the phone redeems a one-time pairing code.
+ */
+export interface PairingRequest {
+    /**
+     * Ten Crockford base32 characters shown on the Mac.
+     */
+    code:       string;
+    deviceName: string;
+}
+
+/**
+ * The device credential issued at pairing. The phone stores deviceSecret in secure storage;
+ * the gateway keeps only its hash.
+ */
+export interface PairingResponse {
+    deviceId: string;
+    /**
+     * 32 random bytes, base64url without padding.
+     */
+    deviceSecret: string;
+}
+
+/**
+ * Body of POST /v1/sessions: the phone exchanges its device credential for a short-lived
+ * session token.
+ */
+export interface SessionRequest {
+    deviceId: string;
+    /**
+     * 32 random bytes, base64url without padding.
+     */
+    deviceSecret: string;
+}
+
+/**
+ * A session token for the Authorization header (Bearer). It expires at expiresAt.
+ */
+export interface SessionResponse {
+    /**
+     * UTC, ISO 8601.
+     */
+    expiresAt: string;
+    /**
+     * 32 random bytes, base64url without padding.
+     */
+    sessionToken: string;
+}

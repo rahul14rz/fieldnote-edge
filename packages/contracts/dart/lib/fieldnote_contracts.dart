@@ -7,6 +7,10 @@
 //     final jobStatus = jobStatusFromJson(jsonString);
 //     final jobSubmission = jobSubmissionFromJson(jsonString);
 //     final meetingSummary = meetingSummaryFromJson(jsonString);
+//     final pairingRequest = pairingRequestFromJson(jsonString);
+//     final pairingResponse = pairingResponseFromJson(jsonString);
+//     final sessionRequest = sessionRequestFromJson(jsonString);
+//     final sessionResponse = sessionResponseFromJson(jsonString);
 
 import 'dart:convert';
 
@@ -25,6 +29,22 @@ String jobSubmissionToJson(JobSubmission data) => json.encode(data.toJson());
 MeetingSummary meetingSummaryFromJson(String str) => MeetingSummary.fromJson(json.decode(str));
 
 String meetingSummaryToJson(MeetingSummary data) => json.encode(data.toJson());
+
+PairingRequest pairingRequestFromJson(String str) => PairingRequest.fromJson(json.decode(str));
+
+String pairingRequestToJson(PairingRequest data) => json.encode(data.toJson());
+
+PairingResponse pairingResponseFromJson(String str) => PairingResponse.fromJson(json.decode(str));
+
+String pairingResponseToJson(PairingResponse data) => json.encode(data.toJson());
+
+SessionRequest sessionRequestFromJson(String str) => SessionRequest.fromJson(json.decode(str));
+
+String sessionRequestToJson(SessionRequest data) => json.encode(data.toJson());
+
+SessionResponse sessionResponseFromJson(String str) => SessionResponse.fromJson(json.decode(str));
+
+String sessionResponseToJson(SessionResponse data) => json.encode(data.toJson());
 
 
 ///Body of GET /health on the Mac gateway.
@@ -272,6 +292,106 @@ class Participant {
     Map<String, dynamic> toJson() => {
         "name": name,
         "role": role,
+    };
+}
+
+
+///Body of POST /v1/pairing: the phone redeems a one-time pairing code.
+class PairingRequest {
+    
+    ///Ten Crockford base32 characters shown on the Mac.
+    final String code;
+    final String deviceName;
+
+    PairingRequest({
+        required this.code,
+        required this.deviceName,
+    });
+
+    factory PairingRequest.fromJson(Map<String, dynamic> json) => PairingRequest(
+        code: json["code"],
+        deviceName: json["deviceName"],
+    );
+
+    Map<String, dynamic> toJson() => {
+        "code": code,
+        "deviceName": deviceName,
+    };
+}
+
+
+///The device credential issued at pairing. The phone stores deviceSecret in secure storage;
+///the gateway keeps only its hash.
+class PairingResponse {
+    final String deviceId;
+    
+    ///32 random bytes, base64url without padding.
+    final String deviceSecret;
+
+    PairingResponse({
+        required this.deviceId,
+        required this.deviceSecret,
+    });
+
+    factory PairingResponse.fromJson(Map<String, dynamic> json) => PairingResponse(
+        deviceId: json["deviceId"],
+        deviceSecret: json["deviceSecret"],
+    );
+
+    Map<String, dynamic> toJson() => {
+        "deviceId": deviceId,
+        "deviceSecret": deviceSecret,
+    };
+}
+
+
+///Body of POST /v1/sessions: the phone exchanges its device credential for a short-lived
+///session token.
+class SessionRequest {
+    final String deviceId;
+    
+    ///32 random bytes, base64url without padding.
+    final String deviceSecret;
+
+    SessionRequest({
+        required this.deviceId,
+        required this.deviceSecret,
+    });
+
+    factory SessionRequest.fromJson(Map<String, dynamic> json) => SessionRequest(
+        deviceId: json["deviceId"],
+        deviceSecret: json["deviceSecret"],
+    );
+
+    Map<String, dynamic> toJson() => {
+        "deviceId": deviceId,
+        "deviceSecret": deviceSecret,
+    };
+}
+
+
+///A session token for the Authorization header (Bearer). It expires at expiresAt.
+class SessionResponse {
+    
+    ///UTC, ISO 8601.
+    final String expiresAt;
+    
+    ///32 random bytes, base64url without padding.
+    final String sessionToken;
+
+    SessionResponse({
+        required this.expiresAt,
+        required this.sessionToken,
+    });
+
+    factory SessionResponse.fromJson(Map<String, dynamic> json) => SessionResponse(
+        expiresAt: json["expiresAt"],
+        sessionToken: json["sessionToken"],
+    );
+
+    Map<String, dynamic> toJson() => {
+        "expiresAt": expiresAt,
+        "sessionToken": sessionToken,
     };
 }
 

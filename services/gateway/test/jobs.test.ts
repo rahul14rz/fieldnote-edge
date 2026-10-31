@@ -2,7 +2,14 @@ import { readFileSync } from "node:fs";
 
 import { afterEach, describe, expect, it } from "vitest";
 
-import { ScriptedBackend, startGateway, stopAll } from "./helpers.js";
+import {
+  type Gateway,
+  ScriptedBackend,
+  call,
+  pairDevice,
+  startGateway,
+  stopAll,
+} from "./helpers.js";
 
 afterEach(stopAll);
 
@@ -17,24 +24,21 @@ const submission = (jobId = "job-1", transcript = "Arun: I will send the quote b
   language: "en",
 });
 
-async function post(url: string, body: unknown): Promise<{ status: number; json: unknown }> {
-  const response = await fetch(`${url}/v1/jobs`, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  return { status: response.status, json: await response.json() };
+let token = "";
+
+async function start(options: Parameters<typeof startGateway>[0] = {}): Promise<Gateway> {
+  const gateway = await startGateway(options);
+  token = (await pairDevice(gateway)).token;
+  return gateway;
 }
 
-async function get(url: string, path: string): Promise<{ status: number; json: unknown }> {
-  const response = await fetch(`${url}${path}`);
-  return { status: response.status, json: await response.json() };
-}
+const post = (url: string, body: unknown) => call(url, "POST", "/v1/jobs", { body, token });
+const get = (url: string, path: string) => call(url, "GET", path, { token });
 
 describe("POST /v1/jobs", () => {
   it("accepts a job, runs it, and serves the validated summary", async () => {
     const backend = new ScriptedBackend([validSummary]);
-    const { url, app } = await startGateway({ backend });
+    const { url, app } = await start({ backend });
 
     const submitted = await post(url, submission());
     await app.idle();
@@ -53,7 +57,7 @@ describe("POST /v1/jobs", () => {
   });
 
   it("accepts a summary wrapped in one code fence", async () => {
-    const { url, app } = await startGateway({
+    const { url, app } = await start({
       backend: new ScriptedBackend(["```json\n" + validSummary.trim() + "\n```"]),
     });
 
@@ -64,7 +68,7 @@ describe("POST /v1/jobs", () => {
   });
 
   it("fails the job as invalid_output when the model answer is not a valid summary", async () => {
-    const { url, app } = await startGateway({
+    const { url, app } = await start({
       backend: new ScriptedBackend(['Sure! {"participants": []}']),
     });
 
@@ -83,7 +87,7 @@ describe("POST /v1/jobs", () => {
 
   it("is idempotent: the same body twice runs the model once", async () => {
     const backend = new ScriptedBackend([validSummary]);
-    const { url, app } = await startGateway({ backend });
+    const { url, app } = await start({ backend });
 
     await post(url, submission());
     await app.idle();
@@ -96,7 +100,7 @@ describe("POST /v1/jobs", () => {
 
   it("does not rerun an invalid_output job on resubmit, because the answer would not change", async () => {
     const backend = new ScriptedBackend(["not json", validSummary]);
-    const { url, app } = await startGateway({ backend });
+    const { url, app } = await start({ backend });
 
     await post(url, submission());
     await app.idle();
@@ -109,7 +113,7 @@ describe("POST /v1/jobs", () => {
 
   it("requeues a backend_error job on resubmit and counts the attempt", async () => {
     const backend = new ScriptedBackend([new Error("model server unreachable"), validSummary]);
-    const { url, app } = await startGateway({ backend });
+    const { url, app } = await start({ backend });
 
     await post(url, submission());
     await app.idle();
@@ -128,7 +132,7 @@ describe("POST /v1/jobs", () => {
   });
 
   it("rejects a different body under an existing job id with 409", async () => {
-    const { url, app } = await startGateway({ backend: new ScriptedBackend([validSummary]) });
+    const { url, app } = await start({ backend: new ScriptedBackend([validSummary]) });
 
     await post(url, submission("job-1", "first"));
     await app.idle();
@@ -137,14 +141,14 @@ describe("POST /v1/jobs", () => {
   });
 
   it("rejects a body that breaks the JobSubmission contract with 400", async () => {
-    const { url } = await startGateway({ backend: new ScriptedBackend([]) });
+    const { url } = await start({ backend: new ScriptedBackend([]) });
 
     expect((await post(url, { ...submission(), jobId: "../x" })).status).toBe(400);
     expect((await post(url, { ...submission(), kind: "transcribe" })).status).toBe(400);
   });
 
   it("refuses jobs with 503 when no inference backend is configured", async () => {
-    const { url } = await startGateway();
+    const { url } = await start();
 
     expect(await post(url, submission())).toEqual({
       status: 503,
@@ -153,7 +157,7 @@ describe("POST /v1/jobs", () => {
   });
 
   it("answers 404 for an unknown job", async () => {
-    const { url } = await startGateway({ backend: new ScriptedBackend([]) });
+    const { url } = await start({ backend: new ScriptedBackend([]) });
 
     expect((await get(url, "/v1/jobs/nope")).status).toBe(404);
     expect((await get(url, "/v1/jobs/nope/summary")).status).toBe(404);
@@ -165,19 +169,32 @@ describe("restart", () => {
     // A backend that never answers keeps the job in processing, like a crash mid-run.
     const hanging = { name: "hanging", generate: () => new Promise<string>(() => undefined) };
     const first = await startGateway({ backend: hanging });
-    await post(first.url, submission());
+    const device = await pairDevice(first);
+    await call(first.url, "POST", "/v1/jobs", { body: submission(), token: device.token });
     await new Promise((resolve) => setTimeout(resolve, 50));
-    expect((await get(first.url, "/v1/jobs/job-1")).json).toMatchObject({ state: "processing" });
+    expect(
+      (await call(first.url, "GET", "/v1/jobs/job-1", { token: device.token })).json,
+    ).toMatchObject({
+      state: "processing",
+    });
     await first.stop();
 
-    const backend = new ScriptedBackend([validSummary]);
-    const second = await startGateway({ backend, dbPath: first.dbPath });
-    await second.app.idle();
-
-    expect((await get(second.url, "/v1/jobs/job-1")).json).toMatchObject({
-      state: "completed",
-      attempts: 2,
+    const second = await startGateway({
+      backend: new ScriptedBackend([validSummary]),
+      dbPath: first.dbPath,
     });
+    await second.app.idle();
+    const session = await call(second.url, "POST", "/v1/sessions", {
+      body: { deviceId: device.deviceId, deviceSecret: device.deviceSecret },
+    });
+    const token2 = (session.json as { sessionToken: string }).sessionToken;
+
+    expect((await call(second.url, "GET", "/v1/jobs/job-1", { token: token2 })).json).toMatchObject(
+      {
+        state: "completed",
+        attempts: 2,
+      },
+    );
     expect(second.logs.some((line) => line.msg === "requeued jobs interrupted by a restart")).toBe(
       true,
     );

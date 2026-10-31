@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/rahul14rz/fieldnote-edge/contracts/session-request.schema.json",
+  "title": "SessionRequest",
+  "description": "Body of POST /v1/sessions: the phone exchanges its device credential for a short-lived session token.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "deviceId",
+    "deviceSecret"
+  ],
+  "properties": {
+    "deviceId": {
+      "type": "string",
+      "pattern": "^dev_[0-9a-f]{32}$"
+    },
+    "deviceSecret": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{43}$",
+      "description": "32 random bytes, base64url without padding."
+    }
+  }
+}
