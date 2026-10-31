@@ -38,7 +38,16 @@ Numbers are compared exactly as written: "5" and "five" count as different words
 
 ## Rates
 
-WER and CER are pooled per language: total edits divided by total reference words (or characters). Each utterance therefore counts in proportion to its length, not equally.
+WER and CER are pooled per language. Each rate is the total number of edits divided by the total number of reference words or characters. Each utterance therefore counts in proportion to its length, not equally.
+
+## Summarize spike result files
+
+`summarize_runs.py` reads result files written by `apps/spike` and produces the measured rows of `benchmarks/results/TEMPLATE.md` (shape: `benchmarks/results/results.schema.json`). Latency is the median of non-warmup runs. Memory is the maximum over runs.
+
+```bash
+cd benchmarks/evaluation
+python3 summarize_runs.py --output summary.json ../results/raw/*/*.json
+```
 
 ## Tests
 
