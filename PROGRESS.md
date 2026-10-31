@@ -7,8 +7,8 @@ Last updated: 2026-10-31.
 | Item | Status | Where |
 | --- | --- | --- |
 | Package versions, compatibility and licenses checked | done | [docs/spike/findings.md](docs/spike/findings.md) |
-| Model licenses checked | partly done. Whisper, IndicConformer and IndicWhisper were read. Gemma 4 and the Hugging Face model cards were unreachable, so those are unverified. | [docs/spike/findings.md](docs/spike/findings.md#model-licenses) |
-| Dataset licenses checked | not done. Every public dataset is unverified. | [benchmarks/datasets/SOURCES.md](benchmarks/datasets/SOURCES.md) |
+| Model licenses checked | done on 2026-11-01. Gemma 4 E2B and 12B, the Whisper LiteRT files, and community Indic Whisper are Apache 2.0. IndicConformer and IndicWhisper are MIT. | [docs/spike/findings.md](docs/spike/findings.md#model-licenses) |
+| Dataset licenses checked | partly done. FLEURS, IndicVoices and Kathbath are CC BY 4.0. Common Voice, Svarah, MUCS 2021 and OpenSLR are unverified. | [benchmarks/datasets/SOURCES.md](benchmarks/datasets/SOURCES.md) |
 | Spike app (LLM and ASR timing and memory) | built and unit-tested with fakes. Not run on a device. | [apps/spike](apps/spike) |
 | WER and CER evaluator | built and tested, including the matra-preservation tests | [benchmarks/evaluation](benchmarks/evaluation) |
 | Results template, schemas, summarizer, output validator | built | [benchmarks/results](benchmarks/results) |

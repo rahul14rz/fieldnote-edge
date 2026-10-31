@@ -23,7 +23,7 @@ pnpm install
 
 ## Download the models
 
-Download the files on the Mac into `benchmarks/datasets/local/models/`, which git ignores. The URLs come from the flutter_edge_ai 2.5.4 documentation. They were not opened during the spike, so check the file names on each Hugging Face page first.
+Download the files on the Mac into `benchmarks/datasets/local/models/`, which git ignores. The URLs come from the flutter_edge_ai 2.5.4 documentation. On 2026-11-01 the Hugging Face API listed all three files, and the repositories are not gated.
 
 ```bash
 mkdir -p benchmarks/datasets/local/models
@@ -34,7 +34,7 @@ curl -L -o whisper-base-tokenizer.json https://huggingface.co/openai/whisper-bas
 cd -
 ```
 
-Before you use each model, read its license on its Hugging Face page and record it in `docs/spike/findings.md`.
+The licenses are recorded in `docs/spike/findings.md`: Apache 2.0 for Gemma 4 E2B and for the Whisper LiteRT files.
 
 ## Prepare the speech recordings
 
@@ -152,7 +152,7 @@ The app records `anonymousBytes` and `fileBackedBytes` from `flutter_edge_ai_dia
 3. Repeat with `asr-gemma4-audio-timing.json` for the Gemma audio arm.
 4. For memory, run the same configs with `"memorySampleIntervalMs": 1000` and the `dumpsys meminfo` loop from the previous section.
 
-The example configs decode code-switched audio with the base language (`ta-en` uses `ta`). To compare, copy a config, change `decodeLanguage` for that pair to `en`, and run it again.
+The Whisper config decodes code-switched audio with the base language code (`ta-en` uses `ta`). To compare, copy it, change `decodeLanguage` for that pair to `en`, and run it again. The Gemma config uses language names instead, such as `Tamil and English`, because the model card's ASR prompt names the language.
 
 ### Copy the results to the Mac
 

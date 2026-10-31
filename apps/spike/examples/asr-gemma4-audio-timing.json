@@ -10,13 +10,13 @@
     "manifest": "asr/manifest.jsonl",
     "windowSeconds": 30,
     "decodeLanguage": {
-      "en": "en",
-      "ta": "ta",
-      "ml": "ml",
-      "hi": "hi",
-      "ta-en": "ta",
-      "ml-en": "ml",
-      "hi-en": "hi"
+      "en": "English",
+      "ta": "Tamil",
+      "ml": "Malayalam",
+      "hi": "Hindi",
+      "ta-en": "Tamil and English",
+      "ml-en": "Malayalam and English",
+      "hi-en": "Hindi and English"
     }
   }
 }

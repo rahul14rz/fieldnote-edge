@@ -1,6 +1,6 @@
 # Dataset sources
 
-This file lists every dataset the evaluation may use, with its license and where the license was read. Licenses were checked on 2026-10-31. **unverified** means the license page could not be read from the session that wrote this file (see [findings](../../docs/spike/findings.md)), so the dataset can't be used until someone reads its license and updates this row.
+This file lists every dataset the evaluation may use, with its license and where the license was read. Licenses were checked on 2026-10-31 and, for Hugging Face entries, again on 2026-11-01. **unverified** means the license page could not be read from the session that wrote this file (see [findings](../../docs/spike/findings.md)), so the dataset can't be used until someone reads its license and updates this row.
 
 ## Rules
 
@@ -21,12 +21,12 @@ The fictional transcripts in `apps/spike/assets/prompt_set.json` can serve as st
 
 | Dataset | Languages relevant here | License | Where the license was read | Notes |
 | --- | --- | --- | --- | --- |
-| Google FLEURS | `en`, `ta`, `ml`, `hi` (unverified) | **unverified** | https://huggingface.co/datasets/google/fleurs could not be reached | Read speech, not conversational. |
-| Mozilla Common Voice | `ta`, `ml`, `hi`, `en` (unverified) | **unverified** | https://commonvoice.mozilla.org/en/datasets could not be reached | Check the dataset terms on speaker re-identification before use. |
-| AI4Bharat IndicVoices | `ta`, `ml`, `hi` (unverified) | **unverified** | https://huggingface.co/datasets/ai4bharat/IndicVoices could not be reached | Access may be gated (unverified). |
-| AI4Bharat Kathbath | `ta`, `ml`, `hi` | **unverified** | https://huggingface.co/datasets/ai4bharat/kathbath could not be reached. The [Vistaar README](https://github.com/AI4Bharat/vistaar) links Kathbath downloads but states a license only for Vistaar's code and models. | Used in the Vistaar benchmark. |
-| AI4Bharat Svarah | Indian-accented English | **unverified**. No license is stated in the [Svarah README](https://github.com/AI4Bharat/Svarah). | https://github.com/AI4Bharat/Svarah | The README links a Hugging Face copy that was not reachable. |
+| Google FLEURS | `en` (`en_us`), `ta` (`ta_in`), `ml` (`ml_in`), `hi` (`hi_in`) | CC BY 4.0 (`cc-by-4.0`) | [Dataset card](https://huggingface.co/datasets/google/fleurs), read 2026-11-01 | Read speech, not conversational. Not gated. |
+| Mozilla Common Voice | `ta`, `ml`, `hi`, `en` (unverified) | **unverified** | The [Hugging Face page](https://huggingface.co/datasets/mozilla-foundation/common_voice_17_0) says that since October 2025 the datasets are available only through Mozilla Data Collective, which this session could not reach | Read the terms on Mozilla Data Collective before use, including any rule on speaker re-identification. |
+| AI4Bharat IndicVoices | `ta`, `ml`, `hi` (unverified) | CC BY 4.0 (`cc-by-4.0`) | [Hugging Face API](https://huggingface.co/api/datasets/ai4bharat/IndicVoices) `cardData.license`, read 2026-11-01 | Gated: you must accept the terms on Hugging Face. |
+| AI4Bharat Kathbath | `ta`, `ml`, `hi` | CC BY 4.0 (`cc-by-4.0`) | [Hugging Face API](https://huggingface.co/api/datasets/ai4bharat/Kathbath) `cardData.license`, read 2026-11-01 | Gated. Used in the Vistaar benchmark. |
+| AI4Bharat Svarah | Indian-accented English | **unverified**. No license is stated in the [Svarah README](https://github.com/AI4Bharat/Svarah), and the gated Hugging Face copy has no license tag. | https://github.com/AI4Bharat/Svarah and https://huggingface.co/api/datasets/ai4bharat/Svarah | |
 | MUCS 2021 (Hindi-English code-switching) | `hi-en` | **unverified** | https://navana-tech.github.io/MUCS2021/ could not be reached | Candidate for `hi-en`. |
 | OpenSLR SLR65 (Tamil), SLR63 (Malayalam) | `ta`, `ml` | **unverified** | https://www.openslr.org/65/ and https://www.openslr.org/63/ could not be reached | Read speech. |
 
-No public Tamil-English or Malayalam-English code-switched speech dataset was found in this check, because the places to search (Hugging Face, OpenSLR) were unreachable. Until one is found and its license is read, `ta-en` and `ml-en` rely on the scripted recordings.
+No public Tamil-English or Malayalam-English code-switched speech dataset has been found yet. Hugging Face became reachable on 2026-11-01 but has not been searched for one, and OpenSLR is still unreachable. Until one is found and its license is read, `ta-en` and `ml-en` rely on the scripted recordings.

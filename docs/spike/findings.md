@@ -1,8 +1,8 @@
 # Milestone 0 findings: packages, models and licenses
 
-All checks were done on 2026-10-31. Every claim below names the source that was read. Where a source could not be reached, the claim is marked **unverified**.
+Package checks were done on 2026-10-31. Model and dataset licenses on Hugging Face and ai.google.dev were checked on 2026-11-01, after the environment's network access was widened. Every claim below names the source that was read. Where a source could not be reached, the claim is marked **unverified**.
 
-The cloud session that wrote this page could reach pub.dev, github.com and raw.githubusercontent.com. Its network policy refused connections to huggingface.co, ai.google.dev, kaggle.com, deepmind.google, openslr.org, commonvoice.mozilla.org and ai4bharat.iitm.ac.in. Model cards hosted on Hugging Face were therefore not read, and every fact that only a model card states is unverified. [Recheck the unverified items](#recheck-the-unverified-items) lists them.
+On 2026-10-31 the session could not reach huggingface.co or ai.google.dev, so those facts were first marked unverified. They were read on 2026-11-01. openslr.org, commonvoice.mozilla.org, ai4bharat.iitm.ac.in and datacollective.mozillafoundation.org were still refused on 2026-11-01.
 
 ## Package versions and compatibility
 
@@ -55,17 +55,23 @@ The pub.dev license tags come from the package score API (`https://pub.dev/api/p
 
 | Model | License | Source read | Status |
 | --- | --- | --- | --- |
-| Gemma 4 E2B (`google/gemma-4-E2B-it`, `litert-community/gemma-4-E2B-it-litert-lm`) | Not read | Hugging Face and ai.google.dev were unreachable | **unverified** |
-| Gemma 4 12B | Not read | See [the larger model for the Mac](#the-larger-model-for-the-mac) | **unverified**, and whether such a general-purpose model exists is also unverified |
+| Gemma 4 E2B (`google/gemma-4-E2B-it`) | Apache 2.0 | [Model card](https://huggingface.co/google/gemma-4-E2B-it): `license: apache-2.0`, linking [the Gemma 4 license page](https://ai.google.dev/gemma/docs/gemma_4_license), which redirects to "Apache License 2.0" at https://ai.google.dev/gemma/apache_2 | verified 2026-11-01 |
+| Gemma 4 E2B LiteRT build (`litert-community/gemma-4-E2B-it-litert-lm`) | Apache 2.0 | [Hugging Face API](https://huggingface.co/api/models/litert-community/gemma-4-E2B-it-litert-lm) `cardData.license`. Not gated. Files include `gemma-4-E2B-it.litertlm` and `gemma-4-E2B-it-gpu.litertlm`. | verified 2026-11-01 |
+| Gemma 4 12B (`google/gemma-4-12B-it`, `litert-community/gemma-4-12B-it-litert-lm`) | Apache 2.0 | Hugging Face API `cardData.license` for both repositories. Neither is gated. | verified 2026-11-01. See [the larger model for the Mac](#the-larger-model-for-the-mac). |
 | Whisper (OpenAI checkpoints) | MIT, code and weights | [openai/whisper README](https://github.com/openai/whisper/blob/main/README.md): "Whisper's code and model weights are released under the MIT License." | verified |
-| Whisper LiteRT conversions (`litert-community/whisper-tiny`, `litert-community/whisper-base`) | Not read | Hugging Face unreachable | **unverified** |
-| AI4Bharat IndicConformer | MIT | [AI4Bharat/IndicConformerASR README](https://github.com/AI4Bharat/IndicConformerASR): "IndicConformer is released under the MIT license." | verified (README statement) |
+| Whisper LiteRT conversions (`litert-community/whisper-tiny`, `litert-community/whisper-base`) | Apache 2.0 | Hugging Face API `cardData.license`. `whisper-base` has `whisper_base_30s_f32.tflite` and `whisper_base_30s_i8.tflite`. | verified 2026-11-01. The OpenAI README says MIT for the original weights, while the conversions are tagged Apache 2.0. Both permit this use. |
+| OpenAI Whisper on Hugging Face (`openai/whisper-small`, `openai/whisper-medium`, `openai/whisper-large-v3-turbo`) | `apache-2.0`, `apache-2.0`, `mit` as tagged | Hugging Face API `cardData.license` | verified 2026-11-01. The tags differ from the GitHub README's MIT statement. This page reports both as found. |
+| AI4Bharat IndicConformer | MIT | [AI4Bharat/IndicConformerASR README](https://github.com/AI4Bharat/IndicConformerASR): "IndicConformer is released under the MIT license." The Hugging Face copy `ai4bharat/indic-conformer-600m-multilingual` is also tagged `mit` and is gated (`auto`). | verified |
 | AI4Bharat IndicWhisper (Vistaar) | MIT, including the fine-tuned models | [AI4Bharat/vistaar README](https://github.com/AI4Bharat/vistaar): "Vistaar is MIT-licensed. The license applies to all the fine-tuned language models" | verified (README statement) |
-| Community fine-tuned Indic Whisper (for example `vasista22/whisper-tamil-medium`) | Not read | Hugging Face unreachable | **unverified** |
+| Community fine-tuned Indic Whisper (`vasista22/whisper-tamil-medium`, `vasista22/whisper-hindi-medium`) | Apache 2.0 | Hugging Face API `cardData.license` | verified 2026-11-01 (tag only; the model cards were not read further) |
 
 ### The larger model for the Mac
 
-The task names "Gemma 4 12B" as the Mac model. The flutter_edge_ai documentation mentions a Gemma 4 12B in only one place: "Intel's Gemma 4 12B for Panther Lake needs 1.17.0" (`flutter_edge_ai_litertlm` 1.19.0 README). That is a build for Intel NPUs on Windows. It doesn't run on a Mac. Whether Google publishes a general-purpose Gemma 4 12B, and under what license, could not be checked without the model cards. The model sizes the package documentation names for Android and macOS are Gemma 4 E2B and Gemma 4 E4B. The Mac model is a Milestone 1 choice. Confirm it from the Gemma 4 model card before Milestone 1 starts.
+A general-purpose Gemma 4 12B exists. The Gemma 4 E2B model card lists the family as E2B, E4B, "12B Unified", 26B A4B and 31B Dense, and `google/gemma-4-12B-it` is on Hugging Face under Apache 2.0. The card's architecture table gives the 12B model 11.95B parameters, a 256K-token context, and text, image and audio input. Its audio has no separate encoder: the card says the 12B model projects "raw image patches and audio waveforms directly into the LLM's embedding space".
+
+`litert-community/gemma-4-12B-it-litert-lm` provides `gemma-4-12B-it.litertlm` and `gemma-4-12B-it-gpu.litertlm`, so the Mac could run it with the same LiteRT-LM engine as the phone. Whether it fits and how fast it runs on the 16 GB MacBook Air M4 is not yet measured. The 12B is the Mac candidate for Milestone 1. Gemma 4 E4B is a smaller fallback if it does not fit.
+
+The only "Gemma 4 12B" in the flutter_edge_ai documentation is a separate Intel NPU build for Windows (`flutter_edge_ai_litertlm` 1.19.0 README). It is not relevant to the Mac.
 
 ## Which ASR models flutter_edge_ai_speech can run on the device
 
@@ -77,7 +83,7 @@ The task names "Gemma 4 12B" as the Mac model. The flutter_edge_ai documentation
 | `whisper` | "99, selectable, default `'en'`" | 30 s | `en`, `ta`, `ml`, `hi` as decode languages. Code-switched speech has no language code of its own. |
 | `parakeet` | English. The skill gives its size as 2.35 GB, "so desktop in practice". | 5 s | `en` |
 
-The bundled speech skill names two Whisper LiteRT files: `litert-community/whisper-tiny/.../whisper_tiny_30s_f32.tflite` and `litert-community/whisper-base/.../whisper_base_30s_i8.tflite`. It says: "Whisper tiny is weak outside English." Those Hugging Face files were not opened from this session, so their exact availability is **unverified**.
+The bundled speech skill names two Whisper LiteRT files: `litert-community/whisper-tiny/.../whisper_tiny_30s_f32.tflite` and `litert-community/whisper-base/.../whisper_base_30s_i8.tflite`. It says: "Whisper tiny is weak outside English." On 2026-11-01 the Hugging Face API listed both files.
 
 ### Candidates that need conversion
 
@@ -96,12 +102,17 @@ The stack accepts audio input for Gemma 4 E2B:
 - The `flutter_edge_ai_speech` README, under "Audio turns: the model hears the recording": "A model with an audio encoder (Gemma 4 E2B/E4B) can take the recording itself." The model is loaded with `supportAudio: true`.
 - The inference skill bundled with `flutter_edge_ai` 2.5.4 says that `Message.audioBytes` takes a whole 16 kHz mono WAV file, and that "Audio input needs Gemma 4 or Gemma 3n, on Android, iOS or desktop". On the web `.litertlm` engine, an audio message throws `UnsupportedError`.
 
-`apps/spike` has a `gemmaAudio` ASR engine for this benchmark arm. It sends each 30-second window as a WAV file and asks for a verbatim transcript.
+`apps/spike` has a `gemmaAudio` ASR engine for this benchmark arm. It sends each 30-second window as a WAV file with the model card's ASR prompt.
 
 Not known:
 
-- The maximum audio length per message for Gemma 4 E2B. The model card was not read. The 30-second window in the spike is an assumption to test, not a documented limit.
-- Speech recognition quality for Tamil, Malayalam, Hindi or code-switched speech. No source read in this check states it. This page makes no quality claim for those languages.
+- Speech recognition quality for Tamil, Malayalam, Hindi or code-switched speech. The model card reports one FLEURS score per model (0.09 for E2B, "lower is better"), not per language, and names no metric. That number says nothing about Tamil, Malayalam or Hindi, so this page makes no quality claim for them.
+
+From the [Gemma 4 E2B model card](https://huggingface.co/google/gemma-4-E2B-it), read on 2026-11-01:
+
+- "Audio supports a maximum length of 30 seconds." The spike's 30-second windows match that limit.
+- The card gives an ASR prompt: "Transcribe the following speech segment in {LANGUAGE} into {LANGUAGE} text.", followed by two formatting rules. It also says to put audio after the text in the prompt. The spike uses that prompt (`apps/spike/lib/src/gemma_asr_prompt.dart`), and the LiteRT-LM engine sends Gemma 4 messages as text, then audio.
+- The card lists audio as "Automatic speech recognition (ASR) and speech-to-translated-text translation across multiple languages" for E2B, E4B and 12B.
 
 ## Memory measurement
 
@@ -113,13 +124,11 @@ Not known:
 
 The spike records all available fields, plus `ProcessInfo.maxRss` from `dart:io`. The [runbook](RUNBOOK.md) adds the OS's own tools (`dumpsys meminfo` on Android, `footprint` and Activity Monitor on macOS) as a cross-check.
 
-## Recheck the unverified items
+## Still unverified
 
-Before Milestone 1, read these pages and update this file and `benchmarks/datasets/SOURCES.md`:
+1. Mozilla Common Voice. Since October 2025 it is distributed only through Mozilla Data Collective (per the [Hugging Face page](https://huggingface.co/datasets/mozilla-foundation/common_voice_17_0)), and that site was refused from this session.
+2. OpenSLR SLR63 and SLR65. openslr.org was refused.
+3. AI4Bharat Svarah. The Hugging Face copy is gated and states no license in the API, and the GitHub README states none.
+4. MUCS 2021. Its site was not reached.
 
-1. The Gemma 4 E2B model card (`https://huggingface.co/google/gemma-4-E2B-it` and the Gemma 4 page on ai.google.dev): license, audio input length limit, and any statement about speech recognition languages.
-2. The Mac model: whether a Gemma 4 12B exists for general use, or which Gemma 4 size to use instead, and its license.
-3. `https://huggingface.co/litert-community/whisper-base` and `whisper-tiny`: license and file list.
-4. Any community Indic Whisper checkpoints you consider.
-
-To let a cloud session read these pages, add `huggingface.co` and `ai.google.dev` to the environment's allowed domains. See [network access](https://code.claude.com/docs/en/cloud-environments#network-access).
+To check these from a cloud session, add `openslr.org`, `datacollective.mozillafoundation.org` and `navana-tech.github.io` to the environment's allowed domains. See [network access](https://code.claude.com/docs/en/cloud-environments#network-access).
