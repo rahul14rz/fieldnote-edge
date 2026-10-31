@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:fieldnote_contracts/fieldnote_contracts.dart' show MeetingSummary;
+import 'package:fieldnote_contracts/fieldnote_contracts.dart'
+    show MeetingSummary;
 import 'package:fieldnote_mobile/src/jobs/job.dart';
 import 'package:fieldnote_mobile/src/jobs/job_store.dart';
 import 'package:fieldnote_mobile/src/pipeline/engines.dart';

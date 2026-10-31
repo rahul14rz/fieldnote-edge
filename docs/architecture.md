@@ -7,12 +7,12 @@ Status: only the boxes marked **built** exist. Everything else is planned. [PROG
 ```mermaid
 flowchart LR
   subgraph phone["Phone: Flutter app (apps/mobile)"]
-    rec["Recorder<br/>(planned)"]
-    asr["On-device ASR<br/>flutter_edge_ai_speech<br/>(planned)"]
-    llm["On-device extraction<br/>Gemma 4 E2B<br/>(planned)"]
-    val["Validate against<br/>MeetingSummary schema<br/>(planned)"]
-    route["Routing policy, Dart<br/>deterministic<br/>(built, not wired)"]
-    jobs[("Durable job store<br/>(built, not wired)")]
+    rec["Recorder<br/>(built)"]
+    asr["On-device ASR<br/>Whisper base<br/>(built, not run on a device)"]
+    llm["On-device extraction<br/>Gemma 4 E2B<br/>(built, not run on a device)"]
+    val["Validate against<br/>MeetingSummary schema<br/>(built)"]
+    route["Routing policy, Dart<br/>deterministic<br/>(built)"]
+    jobs[("Durable job store<br/>(built)")]
     rec --> jobs
     jobs --> route
     route -->|on device| asr --> llm --> val
@@ -22,12 +22,12 @@ flowchart LR
 
   subgraph mac["Mac: gateway (services/gateway)"]
     health["GET /health<br/>(built)"]
-    api["Job API, SQLite<br/>(built, no model yet)"]
-    big["Gemma 4 12B candidate<br/>(planned, not measured)"]
+    api["Job API, SQLite, TLS<br/>(built)"]
+    big["OpenAI-compatible model server<br/>Gemma 4 12B candidate<br/>(not measured)"]
     api --> big
   end
 
-  route -->|"escalate when paired and reachable<br/>(planned)"| api
+  route -->|"escalate over pinned TLS<br/>(built)"| api
   api -->|result| jobs
 
   contracts["packages/contracts<br/>JSON Schema, generated Dart and TS<br/>(built)"]
@@ -39,7 +39,7 @@ flowchart LR
 
 ### Phone app (`apps/mobile`)
 
-The phone app is built with Flutter for Android and macOS. iOS is out of scope, because the project has no iOS device. Today it shows one placeholder screen. In Milestone 1 it will own recording, the job store, on-device ASR and extraction, validation, and the routing policy.
+The phone app is built with Flutter for Android and macOS. iOS is out of scope, because the project has no iOS device. It records, transcribes and summarizes on the device, validates summaries, routes jobs, and pairs with the Mac ([ADR 0012](decisions/0012-mobile-pipeline.md)). It has not been run on a device yet.
 
 ### Routing policy (planned, in the app)
 
@@ -47,7 +47,7 @@ The routing policy (`apps/mobile/lib/src/routing/routing_policy.dart`) is a Dart
 
 ### Gateway (`services/gateway`)
 
-The gateway is a Fastify and TypeScript service on the Mac. It serves `GET /health` and an idempotent job API backed by SQLite ([ADR 0008](decisions/0008-gateway-job-api.md)), validates its environment at startup, and writes structured JSON logs with a correlation ID per request. No model runs on it yet. It listens only on loopback until pairing exists ([ADR 0006](decisions/0006-gateway-binds-loopback-until-pairing.md)).
+The gateway is a Fastify and TypeScript service on the Mac. It serves `GET /health` and an idempotent job API backed by SQLite ([ADR 0008](decisions/0008-gateway-job-api.md)) over TLS 1.3 with a pinned certificate ([ADR 0010](decisions/0010-tls-and-pinned-pairing.md)). It runs summaries through any local OpenAI-compatible model server and advertises itself over mDNS ([ADR 0011](decisions/0011-mac-inference-backend-and-mdns.md)). It validates its environment at startup and writes structured JSON logs with a correlation ID per request. It listens only on loopback until pairing exists ([ADR 0006](decisions/0006-gateway-binds-loopback-until-pairing.md)).
 
 ### Contracts (`packages/contracts`)
 

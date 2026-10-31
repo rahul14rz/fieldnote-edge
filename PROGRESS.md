@@ -34,12 +34,12 @@ Started on 2026-11-01 at the user's request, in parallel with the device measure
 
 | Item | Status | Where |
 | --- | --- | --- |
-| Durable job state machine and crash-safe job store on the phone | done, not wired into the app | [ADR 0007](docs/decisions/0007-job-store-and-routing-rules.md) |
+| Durable job state machine and crash-safe job store on the phone | done | [ADR 0007](docs/decisions/0007-job-store-and-routing-rules.md) |
 | Deterministic routing policy in Dart | done, size limits unset until measured | [ADR 0007](docs/decisions/0007-job-store-and-routing-rules.md) |
 | Gateway job API with idempotent submits and SQLite storage | done, no inference backend | [ADR 0008](docs/decisions/0008-gateway-job-api.md) |
-| Mac inference backend (Gemma 4 12B candidate) | not started; waits for Mac measurements | |
-| Phone recording, transcription and extraction pipeline | not started; waits for the go/no-go table | |
-| Pairing, session tokens, revocation, per-device jobs (gateway) | done; phone side not started | [ADR 0009](docs/decisions/0009-pairing-and-sessions.md) |
-| TLS 1.3 with a pinned self-signed certificate, pairing proofs (gateway) | done; phone side not started | [ADR 0010](docs/decisions/0010-tls-and-pinned-pairing.md) |
-| mDNS discovery | not started | [docs/security.md](docs/security.md) |
+| Mac inference backend through any OpenAI-compatible server | done; the model is not measured | [ADR 0011](docs/decisions/0011-mac-inference-backend-and-mdns.md) |
+| Phone recording, transcription, extraction, validation and escalation | done with candidate models; not run on a device | [ADR 0012](docs/decisions/0012-mobile-pipeline.md) |
+| Pairing, session tokens, revocation, per-device jobs | done on the gateway and the phone | [ADR 0009](docs/decisions/0009-pairing-and-sessions.md) |
+| TLS 1.3 with a pinned self-signed certificate, pairing proofs | done on the gateway and the phone | [ADR 0010](docs/decisions/0010-tls-and-pinned-pairing.md) |
+| mDNS discovery | done; tested on Linux, not on a phone | [ADR 0011](docs/decisions/0011-mac-inference-backend-and-mdns.md) |
 | Phone-only, Mac-only and hybrid evaluation harness | not started | |
