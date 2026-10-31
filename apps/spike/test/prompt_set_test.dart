@@ -12,6 +12,21 @@ void main() {
     schema: schema,
   );
 
+  test(
+    'the template is the gateway prompt in packages/contracts, byte for byte',
+    () {
+      final json = jsonDecode(
+        File('assets/prompt_set.json').readAsStringSync(),
+      ) as Map<String, Object?>;
+
+      expect(
+        json['template'],
+        File('../../packages/contracts/prompts/summarize.txt')
+            .readAsStringSync(),
+      );
+    },
+  );
+
   test('the bundled schema is the contracts schema, byte for byte', () {
     expect(
       schema,

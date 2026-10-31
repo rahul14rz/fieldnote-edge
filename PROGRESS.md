@@ -1,6 +1,6 @@
 # Progress
 
-Last updated: 2026-10-31.
+Last updated: 2026-11-01.
 
 ## Milestone 0: feasibility spike
 
@@ -30,4 +30,14 @@ Last updated: 2026-10-31.
 
 ## Milestone 1
 
-Not started. It starts after every row of the go/no-go table has a decision.
+Started on 2026-11-01 at the user's request, in parallel with the device measurements. Parts that depend on the go/no-go decisions wait for them.
+
+| Item | Status | Where |
+| --- | --- | --- |
+| Durable job state machine and crash-safe job store on the phone | done, not wired into the app | [ADR 0007](docs/decisions/0007-job-store-and-routing-rules.md) |
+| Deterministic routing policy in Dart | done, size limits unset until measured | [ADR 0007](docs/decisions/0007-job-store-and-routing-rules.md) |
+| Gateway job API with idempotent submits and SQLite storage | done, no inference backend | [ADR 0008](docs/decisions/0008-gateway-job-api.md) |
+| Mac inference backend (Gemma 4 12B candidate) | not started; waits for Mac measurements | |
+| Phone recording, transcription and extraction pipeline | not started; waits for the go/no-go table | |
+| mDNS discovery, pairing, TLS with pinning, revocation | not started | [docs/security.md](docs/security.md) |
+| Phone-only, Mac-only and hybrid evaluation harness | not started | |

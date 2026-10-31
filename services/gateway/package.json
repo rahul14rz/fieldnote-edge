@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@fieldnote/contracts": "workspace:*",
+    "ajv": "^8.20.0",
     "fastify": "^5.12.7",
     "zod": "^4.6.7"
   },

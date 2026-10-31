@@ -4,6 +4,8 @@ const EnvSchema = z.object({
   HOST: z.string().min(1).default("127.0.0.1"),
   PORT: z.coerce.number().int().min(0).max(65_535).default(8787),
   LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"]).default("info"),
+  DATA_DIR: z.string().min(1).default("./data"),
+  INFERENCE_BACKEND: z.enum(["none"]).default("none"),
 });
 
 export type Env = z.infer<typeof EnvSchema>;

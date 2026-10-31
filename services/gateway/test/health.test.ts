@@ -1,27 +1,12 @@
-import type { AddressInfo } from "node:net";
-
 import { afterEach, describe, expect, it } from "vitest";
 
-import { buildApp } from "../src/app.js";
+import { startGateway, stopAll } from "./helpers.js";
 
-type App = ReturnType<typeof buildApp>;
-const apps: App[] = [];
+afterEach(stopAll);
 
 async function start(): Promise<{ url: string; logs: Record<string, unknown>[] }> {
-  const logs: Record<string, unknown>[] = [];
-  const app = buildApp({
-    env: { LOG_LEVEL: "info" },
-    logStream: { write: (line) => void logs.push(JSON.parse(line) as Record<string, unknown>) },
-  });
-  apps.push(app);
-  await app.listen({ host: "127.0.0.1", port: 0 });
-  const { port } = app.server.address() as AddressInfo;
-  return { url: `http://127.0.0.1:${String(port)}`, logs };
+  return startGateway();
 }
-
-afterEach(async () => {
-  await Promise.all(apps.splice(0).map((app) => app.close()));
-});
 
 describe("GET /health", () => {
   it("answers 200 with the HealthResponse contract over a real socket", async () => {

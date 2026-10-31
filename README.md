@@ -32,7 +32,7 @@ The routing decision runs on the phone and is deterministic ([ADR 0002](docs/dec
 | --- | --- |
 | `apps/mobile` | Flutter app for Android and macOS. It has one placeholder screen. |
 | `apps/spike` | Milestone 0 measurement app: on-device LLM and ASR latency and memory. |
-| `services/gateway` | Fastify + TypeScript gateway. It serves `GET /health` only. |
+| `services/gateway` | Fastify + TypeScript gateway: `GET /health` and an idempotent job API with no model behind it yet. |
 | `packages/contracts` | JSON Schema contracts and the Dart and TypeScript types generated from them. |
 | `benchmarks/evaluation` | WER and CER evaluator, run summarizer. |
 | `benchmarks/datasets` | Dataset sources and licenses. No audio is committed. |
@@ -134,11 +134,13 @@ Nothing below is built unless it is marked **built**.
 - not built: the measurements themselves. The user runs them on the devices with the runbook.
 - not built: the go/no-go decision.
 
-### Milestone 1: product (starts after the go/no-go table is filled in)
+### Milestone 1: product (started in parallel with the device measurements)
 
-- not built: recording and durable job store with the job state machine in [docs/failure-handling.md](docs/failure-handling.md)
+- **built.** Durable job state machine and job store on the phone ([ADR 0007](docs/decisions/0007-job-store-and-routing-rules.md)). Not wired into the app yet.
+- **built.** Deterministic routing policy in Dart. Size limits are unset until measured.
+- **built.** Gateway job API with idempotent submits and SQLite storage ([ADR 0008](docs/decisions/0008-gateway-job-api.md)). No model runs on it yet.
+- not built: recording
 - not built: on-device transcription and summary extraction
-- not built: deterministic routing policy in Dart
 - not built: gateway inference with the larger Gemma model
 - not built: mDNS discovery, pairing, session credentials, TLS with certificate pinning, and revocation ([docs/security.md](docs/security.md))
 - not built: phone-only, Mac-only and hybrid evaluation harness
