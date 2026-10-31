@@ -57,6 +57,31 @@ jobs:
           dart analyze
           dart test
 
+  gateway-client:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Build the gateway the integration tests run
+        run: pnpm --filter @fieldnote/gateway build
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - name: Client tests against the real gateway
+        working-directory: packages/gateway_client
+        run: |
+          dart pub get
+          dart format --output=none --set-exit-if-changed lib test
+          dart analyze
+          dart test
+
   mobile:
     runs-on: ubuntu-latest
     strategy:

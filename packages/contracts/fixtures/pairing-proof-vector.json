@@ -1,0 +1,7 @@
+{
+  "description": "Pairing proof test vector shared by the gateway (TypeScript) and the phone client (Dart). See ADR 0010.",
+  "code": "44PY2HRX7D",
+  "fingerprint": "abababababababababababababababababababababababababababababababab",
+  "clientProof": "730439a5df4c23b756f32b79f08eccd0a26ab0bee0e989a16283478d6c1f39d4",
+  "serverProof": "c0bd6f4491b000f5420b17c334098069e8974488ad4b4a34fec2f9e5a6ce1a1c"
+}

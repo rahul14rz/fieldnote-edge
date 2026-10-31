@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+
 import { afterEach, describe, expect, it } from "vitest";
 
 import { PAIRING_FAILURE_LIMIT } from "../src/app.js";
@@ -162,5 +164,19 @@ describe("revocation", () => {
       ).status,
     ).toBe(401);
     expect(gateway.auth.devices()[0]?.revokedAt).not.toBeNull();
+  });
+});
+
+describe("pairing proof vector", () => {
+  it("matches the vector the Dart client tests against", () => {
+    const vector = JSON.parse(
+      readFileSync(
+        new URL("../../../packages/contracts/fixtures/pairing-proof-vector.json", import.meta.url),
+        "utf8",
+      ),
+    ) as { code: string; fingerprint: string; clientProof: string; serverProof: string };
+
+    expect(clientProof(vector.code, vector.fingerprint)).toBe(vector.clientProof);
+    expect(serverProof(vector.code, vector.fingerprint)).toBe(vector.serverProof);
   });
 });
