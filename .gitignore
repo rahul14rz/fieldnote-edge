@@ -31,3 +31,6 @@ packages/contracts/dart/pubspec.lock
 # Gateway data
 services/gateway/data/
 /data/
+
+# Dart package lockfiles (apps commit theirs)
+packages/gateway_client/pubspec.lock

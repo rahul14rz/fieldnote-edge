@@ -1,0 +1,17 @@
+name: fieldnote_gateway_client
+description: "Phone-side client for the Fieldnote Edge gateway: discovery, pinned TLS, pairing, sessions and jobs."
+publish_to: none
+version: 0.0.0
+
+environment:
+  sdk: ^3.13.0
+
+dependencies:
+  crypto: ^3.0.6
+  fieldnote_contracts:
+    path: ../contracts/dart
+  multicast_dns: ^0.3.3
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.26.0
