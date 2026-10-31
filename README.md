@@ -56,10 +56,11 @@ pnpm --filter @fieldnote/gateway build
 PORT=8787 node services/gateway/dist/src/server.js
 ```
 
-In a second terminal:
+In a second terminal, from the repository root (the certificate is self-signed, so pin its public key):
 
 ```bash
-curl -sS http://127.0.0.1:8787/health
+PIN=$(openssl x509 -in data/tls/gateway-cert.pem -pubkey -noout | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | base64)
+curl -sS -k --pinnedpubkey "sha256//$PIN" https://127.0.0.1:8787/health
 ```
 
 The response is `{"status":"ok","service":"fieldnote-gateway","version":"0.0.0"}`.
@@ -143,7 +144,8 @@ Nothing below is built unless it is marked **built**.
 - not built: on-device transcription and summary extraction
 - not built: gateway inference with the larger Gemma model
 - **built.** Pairing codes, device credentials, 15-minute session tokens and revocation on the gateway ([ADR 0009](docs/decisions/0009-pairing-and-sessions.md)). The phone side is not built.
-- not built: TLS with certificate pinning and mDNS discovery ([docs/security.md](docs/security.md))
+- **built.** TLS 1.3 with a pinned self-signed certificate, and pairing proofs bound to it ([ADR 0010](docs/decisions/0010-tls-and-pinned-pairing.md)).
+- not built: mDNS discovery ([docs/security.md](docs/security.md))
 - not built: phone-only, Mac-only and hybrid evaluation harness
 
 ## License

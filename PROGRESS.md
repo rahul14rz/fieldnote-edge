@@ -40,5 +40,6 @@ Started on 2026-11-01 at the user's request, in parallel with the device measure
 | Mac inference backend (Gemma 4 12B candidate) | not started; waits for Mac measurements | |
 | Phone recording, transcription and extraction pipeline | not started; waits for the go/no-go table | |
 | Pairing, session tokens, revocation, per-device jobs (gateway) | done; phone side not started | [ADR 0009](docs/decisions/0009-pairing-and-sessions.md) |
-| TLS with certificate pinning, mDNS discovery | not started | [docs/security.md](docs/security.md) |
+| TLS 1.3 with a pinned self-signed certificate, pairing proofs (gateway) | done; phone side not started | [ADR 0010](docs/decisions/0010-tls-and-pinned-pairing.md) |
+| mDNS discovery | not started | [docs/security.md](docs/security.md) |
 | Phone-only, Mac-only and hybrid evaluation harness | not started | |
