@@ -3,22 +3,27 @@ import { join } from "node:path";
 
 import { AuthStore } from "./auth/store.js";
 import { EnvError, parseEnv } from "./env.js";
+import { loadOrCreateIdentity } from "./tls/identity.js";
 
 const usage = `Usage:
   fieldnote-gateway pair             Print a one-time pairing code for a phone
   fieldnote-gateway devices          List paired devices
   fieldnote-gateway revoke <id>      Revoke a device and end its sessions`;
 
-function main(args: string[]): number {
+async function main(args: string[]): Promise<number> {
   const env = parseEnv(process.env);
   mkdirSync(env.DATA_DIR, { recursive: true });
   const auth = new AuthStore(join(env.DATA_DIR, "gateway.sqlite"), () => new Date());
   try {
     switch (args[0]) {
       case "pair": {
-        const { code, expiresAt } = auth.createPairingCode();
+        const { fingerprint } = await loadOrCreateIdentity(join(env.DATA_DIR, "tls"));
+        const { code, expiresAt } = auth.createPairingCode(fingerprint);
         console.log(`Pairing code: ${code}`);
         console.log(`Expires at:   ${expiresAt} (single use)`);
+        console.log(
+          `Certificate:  ${fingerprint.slice(0, 16)}… (the phone shows the same start after pairing)`,
+        );
         return 0;
       }
       case "devices": {
@@ -47,9 +52,12 @@ function main(args: string[]): number {
   }
 }
 
-try {
-  process.exitCode = main(process.argv.slice(2));
-} catch (error) {
-  console.error(error instanceof EnvError ? error.message : error);
-  process.exitCode = 1;
-}
+main(process.argv.slice(2)).then(
+  (code) => {
+    process.exitCode = code;
+  },
+  (error: unknown) => {
+    console.error(error instanceof EnvError ? error.message : error);
+    process.exitCode = 1;
+  },
+);

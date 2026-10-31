@@ -30,3 +30,4 @@ packages/contracts/dart/pubspec.lock
 
 # Gateway data
 services/gateway/data/
+/data/

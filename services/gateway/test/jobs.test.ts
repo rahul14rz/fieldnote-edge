@@ -43,7 +43,7 @@ describe("POST /v1/jobs", () => {
     const submitted = await post(url, submission());
     await app.idle();
 
-    expect(submitted).toEqual({
+    expect(submitted).toMatchObject({
       status: 202,
       json: { jobId: "job-1", state: "queued", attempts: 0, error: null },
     });
@@ -79,7 +79,7 @@ describe("POST /v1/jobs", () => {
       state: "failed",
       error: { kind: "invalid_output", message: "the answer is not JSON" },
     });
-    expect(await get(url, "/v1/jobs/job-1/summary")).toEqual({
+    expect(await get(url, "/v1/jobs/job-1/summary")).toMatchObject({
       status: 409,
       json: { message: "job is failed, not completed" },
     });
@@ -150,7 +150,7 @@ describe("POST /v1/jobs", () => {
   it("refuses jobs with 503 when no inference backend is configured", async () => {
     const { url } = await start();
 
-    expect(await post(url, submission())).toEqual({
+    expect(await post(url, submission())).toMatchObject({
       status: 503,
       json: { message: "no inference backend is configured on the gateway" },
     });

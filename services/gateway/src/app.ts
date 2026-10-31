@@ -65,6 +65,8 @@ export interface AppOptions {
   /** Without a backend the gateway refuses new jobs with 503. */
   backend?: InferenceBackend;
   now?: () => Date;
+  /** Serve HTTPS with this key and certificate. Without it the server speaks plain HTTP. */
+  tls?: { key: string; cert: string };
   logStream?: { write(line: string): void };
 }
 
@@ -86,9 +88,11 @@ export function buildApp({
   auth,
   backend,
   now = () => new Date(),
+  tls,
   logStream,
 }: AppOptions): App {
   const server = Fastify({
+    ...(tls ? { https: { key: tls.key, cert: tls.cert, minVersion: "TLSv1.3" as const } } : {}),
     logger: logStream ? { level: env.LOG_LEVEL, stream: logStream } : { level: env.LOG_LEVEL },
     genReqId: correlationId,
     logController: new LogController({ requestIdLogLabel: "correlationId" }),
@@ -133,13 +137,13 @@ export function buildApp({
       if (pairingFailures.length >= PAIRING_FAILURE_LIMIT) {
         return reply.code(429).send({ message: "too many failed pairing attempts; wait a minute" });
       }
-      const credential = auth.redeemPairingCode(request.body.code, request.body.deviceName);
+      const credential = auth.redeemPairingProof(request.body.proof, request.body.deviceName);
       if (!credential) {
         pairingFailures.push(t);
         request.log.warn("pairing code rejected");
         return reply
           .code(401)
-          .send({ message: "the pairing code is wrong, expired or already used" });
+          .send({ message: "the pairing proof matches no unexpired, unused pairing code" });
       }
       request.log.info({ deviceId: credential.deviceId }, "device paired");
       return reply.code(201).send(credential);

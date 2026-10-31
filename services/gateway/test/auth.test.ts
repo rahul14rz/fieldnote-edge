@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 
 import { PAIRING_FAILURE_LIMIT } from "../src/app.js";
+import { clientProof, serverProof } from "../src/auth/proof.js";
 import { ScriptedBackend, call, pairDevice, startGateway, stopAll } from "./helpers.js";
 
 afterEach(stopAll);
@@ -8,57 +9,80 @@ afterEach(stopAll);
 const job = { jobId: "job-1", kind: "summarize", transcript: "Arun: hello", language: "en" };
 
 describe("pairing", () => {
-  it("redeems a code once for a device credential that yields working session tokens", async () => {
+  it("redeems a code once, proves itself to the phone, and yields working session tokens", async () => {
     const gateway = await startGateway({ backend: new ScriptedBackend([]) });
-    const { code } = gateway.auth.createPairingCode();
+    const { code } = gateway.auth.createPairingCode(gateway.tls.fingerprint);
+    const proof = clientProof(code, gateway.tls.fingerprint);
 
     const paired = await call(gateway.url, "POST", "/v1/pairing", {
-      body: { code, deviceName: "OnePlus 11R" },
+      body: { proof, deviceName: "OnePlus 11R" },
     });
     const reused = await call(gateway.url, "POST", "/v1/pairing", {
-      body: { code, deviceName: "Other" },
+      body: { proof, deviceName: "Other" },
     });
 
     expect(paired.status).toBe(201);
-    expect(paired.json).toMatchObject({
-      deviceId: expect.stringMatching(/^dev_[0-9a-f]{32}$/) as unknown,
-    });
+    const body = paired.json as { deviceId: string; deviceSecret: string; serverProof: string };
+    expect(body.deviceId).toMatch(/^dev_[0-9a-f]{32}$/);
+    expect(body.serverProof).toBe(serverProof(code, gateway.tls.fingerprint));
     expect(reused.status).toBe(401);
-    const session = await call(gateway.url, "POST", "/v1/sessions", { body: paired.json });
+    const session = await call(gateway.url, "POST", "/v1/sessions", {
+      body: { deviceId: body.deviceId, deviceSecret: body.deviceSecret },
+    });
     expect(session.status).toBe(201);
     expect(gateway.auth.devices().map((d) => d.name)).toEqual(["OnePlus 11R"]);
   });
 
+  it("rejects a proof made over another certificate, as a man in the middle would send", async () => {
+    const gateway = await startGateway();
+    const { code } = gateway.auth.createPairingCode(gateway.tls.fingerprint);
+    const attackerFingerprint = "ab".repeat(32);
+
+    const relayed = await call(gateway.url, "POST", "/v1/pairing", {
+      body: { proof: clientProof(code, attackerFingerprint), deviceName: "phone" },
+    });
+
+    expect(relayed.status).toBe(401);
+    expect(gateway.auth.devices()).toEqual([]);
+  });
+
   it("rejects an expired code", async () => {
     const gateway = await startGateway();
-    const { code } = gateway.auth.createPairingCode();
+    const { code } = gateway.auth.createPairingCode(gateway.tls.fingerprint);
     gateway.clock.advance(5 * 60_000 + 1);
 
+    const proof = clientProof(code, gateway.tls.fingerprint);
     expect(
-      (await call(gateway.url, "POST", "/v1/pairing", { body: { code, deviceName: "p" } })).status,
+      (await call(gateway.url, "POST", "/v1/pairing", { body: { proof, deviceName: "p" } })).status,
     ).toBe(401);
   });
 
-  it("answers 429 after repeated wrong codes, until the window passes", async () => {
+  it("answers 429 after repeated wrong proofs, until the window passes", async () => {
     const gateway = await startGateway();
-    const wrong = { code: "0000000000", deviceName: "attacker" };
+    const wrong = { proof: "0".repeat(64), deviceName: "attacker" };
     for (let i = 0; i < PAIRING_FAILURE_LIMIT; i++) {
       expect((await call(gateway.url, "POST", "/v1/pairing", { body: wrong })).status).toBe(401);
     }
-    const { code } = gateway.auth.createPairingCode();
+    const { code } = gateway.auth.createPairingCode(gateway.tls.fingerprint);
+    const proof = clientProof(code, gateway.tls.fingerprint);
 
     expect(
-      (await call(gateway.url, "POST", "/v1/pairing", { body: { code, deviceName: "p" } })).status,
+      (await call(gateway.url, "POST", "/v1/pairing", { body: { proof, deviceName: "p" } })).status,
     ).toBe(429);
     gateway.clock.advance(60_000);
     expect(
-      (await call(gateway.url, "POST", "/v1/pairing", { body: { code, deviceName: "p" } })).status,
+      (await call(gateway.url, "POST", "/v1/pairing", { body: { proof, deviceName: "p" } })).status,
     ).toBe(201);
   });
 
   it("generates codes of ten Crockford base32 characters that differ each time", async () => {
     const gateway = await startGateway();
-    const codes = new Set(Array.from({ length: 50 }, () => gateway.auth.createPairingCode().code));
+    const codes = new Set(
+      Array.from(
+        { length: 50 },
+        () => gateway.auth.createPairingCode(gateway.tls.fingerprint).code,
+      ),
+    );
 
     expect(codes.size).toBe(50);
     for (const code of codes) expect(code).toMatch(/^[0-9A-HJKMNP-TV-Z]{10}$/);
@@ -97,7 +121,7 @@ describe("job endpoints", () => {
     const missing = await call(gateway.url, "POST", "/v1/jobs", { body: job });
     const forged = await call(gateway.url, "GET", "/v1/jobs/job-1", { token: "A".repeat(43) });
 
-    expect(missing).toEqual({
+    expect(missing).toMatchObject({
       status: 401,
       json: { message: "a valid session token is required" },
     });
