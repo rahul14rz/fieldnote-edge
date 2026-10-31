@@ -14,6 +14,53 @@ export interface HealthResponse {
 }
 
 /**
+ * A gateway job as returned by POST /v1/jobs and GET /v1/jobs/{jobId}. The summary of a
+ * completed job is at GET /v1/jobs/{jobId}/summary.
+ */
+export interface JobStatus {
+    attempts: number;
+    /**
+     * Set when state is failed, otherwise null.
+     */
+    error: JobError | null;
+    jobId: string;
+    state: JobState;
+}
+
+export interface JobError {
+    /**
+     * invalid_output: the model answered but the answer is not a valid MeetingSummary; retrying
+     * gives the same answer. backend_error: the model could not answer; the phone may retry.
+     */
+    kind:    JobErrorKind;
+    message: string;
+}
+
+/**
+ * invalid_output: the model answered but the answer is not a valid MeetingSummary; retrying
+ * gives the same answer. backend_error: the model could not answer; the phone may retry.
+ */
+export type JobErrorKind = "invalid_output" | "backend_error";
+
+export type JobState = "queued" | "processing" | "completed" | "failed";
+
+/**
+ * Body of POST /v1/jobs: a summarize job the phone escalates to the Mac.
+ */
+export interface JobSubmission {
+    /**
+     * The phone's job ID. Submitting the same ID and body again returns the existing job.
+     */
+    jobId: string;
+    kind:  "summarize";
+    /**
+     * Language code of the transcript (en, ta, ml, hi, ta-en, ml-en, hi-en), or null if unknown.
+     */
+    language:   null | string;
+    transcript: string;
+}
+
+/**
  * Structured summary extracted from one transcribed meeting or customer visit.
  */
 export interface MeetingSummary {

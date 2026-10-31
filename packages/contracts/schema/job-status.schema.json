@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/rahul14rz/fieldnote-edge/contracts/job-status.schema.json",
+  "title": "JobStatus",
+  "description": "A gateway job as returned by POST /v1/jobs and GET /v1/jobs/{jobId}. The summary of a completed job is at GET /v1/jobs/{jobId}/summary.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "jobId",
+    "state",
+    "attempts",
+    "error"
+  ],
+  "properties": {
+    "jobId": {
+      "type": "string"
+    },
+    "state": {
+      "title": "JobState",
+      "type": "string",
+      "enum": [
+        "queued",
+        "processing",
+        "completed",
+        "failed"
+      ]
+    },
+    "attempts": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "error": {
+      "description": "Set when state is failed, otherwise null.",
+      "anyOf": [
+        {
+          "$ref": "#/definitions/JobError"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "definitions": {
+    "JobError": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "message"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "invalid_output",
+            "backend_error"
+          ],
+          "description": "invalid_output: the model answered but the answer is not a valid MeetingSummary; retrying gives the same answer. backend_error: the model could not answer; the phone may retry.",
+          "title": "JobErrorKind"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

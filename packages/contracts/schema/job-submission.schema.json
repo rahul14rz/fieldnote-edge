@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/rahul14rz/fieldnote-edge/contracts/job-submission.schema.json",
+  "title": "JobSubmission",
+  "description": "Body of POST /v1/jobs: a summarize job the phone escalates to the Mac.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "jobId",
+    "kind",
+    "transcript",
+    "language"
+  ],
+  "properties": {
+    "jobId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._-]{1,64}$",
+      "description": "The phone's job ID. Submitting the same ID and body again returns the existing job."
+    },
+    "kind": {
+      "title": "JobKind",
+      "type": "string",
+      "enum": [
+        "summarize"
+      ]
+    },
+    "transcript": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200000
+    },
+    "language": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Language code of the transcript (en, ta, ml, hi, ta-en, ml-en, hi-en), or null if unknown."
+    }
+  }
+}

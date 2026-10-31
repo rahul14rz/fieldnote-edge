@@ -4,6 +4,8 @@
 // To parse this JSON data, do
 //
 //     final healthResponse = healthResponseFromJson(jsonString);
+//     final jobStatus = jobStatusFromJson(jsonString);
+//     final jobSubmission = jobSubmissionFromJson(jsonString);
 //     final meetingSummary = meetingSummaryFromJson(jsonString);
 
 import 'dart:convert';
@@ -11,6 +13,14 @@ import 'dart:convert';
 HealthResponse healthResponseFromJson(String str) => HealthResponse.fromJson(json.decode(str));
 
 String healthResponseToJson(HealthResponse data) => json.encode(data.toJson());
+
+JobStatus jobStatusFromJson(String str) => JobStatus.fromJson(json.decode(str));
+
+String jobStatusToJson(JobStatus data) => json.encode(data.toJson());
+
+JobSubmission jobSubmissionFromJson(String str) => JobSubmission.fromJson(json.decode(str));
+
+String jobSubmissionToJson(JobSubmission data) => json.encode(data.toJson());
 
 MeetingSummary meetingSummaryFromJson(String str) => MeetingSummary.fromJson(json.decode(str));
 
@@ -58,6 +68,131 @@ enum Status {
 
 final statusValues = EnumValues({
     "ok": Status.OK
+});
+
+
+///A gateway job as returned by POST /v1/jobs and GET /v1/jobs/{jobId}. The summary of a
+///completed job is at GET /v1/jobs/{jobId}/summary.
+class JobStatus {
+    final int attempts;
+    
+    ///Set when state is failed, otherwise null.
+    final JobError? error;
+    final String jobId;
+    final JobState state;
+
+    JobStatus({
+        required this.attempts,
+        required this.error,
+        required this.jobId,
+        required this.state,
+    });
+
+    factory JobStatus.fromJson(Map<String, dynamic> json) => JobStatus(
+        attempts: json["attempts"],
+        error: json["error"] == null ? null : JobError.fromJson(json["error"]),
+        jobId: json["jobId"],
+        state: jobStateValues.map[json["state"]]!,
+    );
+
+    Map<String, dynamic> toJson() => {
+        "attempts": attempts,
+        "error": error?.toJson(),
+        "jobId": jobId,
+        "state": jobStateValues.reverse[state],
+    };
+}
+
+class JobError {
+    
+    ///invalid_output: the model answered but the answer is not a valid MeetingSummary; retrying
+    ///gives the same answer. backend_error: the model could not answer; the phone may retry.
+    final JobErrorKind kind;
+    final String message;
+
+    JobError({
+        required this.kind,
+        required this.message,
+    });
+
+    factory JobError.fromJson(Map<String, dynamic> json) => JobError(
+        kind: jobErrorKindValues.map[json["kind"]]!,
+        message: json["message"],
+    );
+
+    Map<String, dynamic> toJson() => {
+        "kind": jobErrorKindValues.reverse[kind],
+        "message": message,
+    };
+}
+
+
+///invalid_output: the model answered but the answer is not a valid MeetingSummary; retrying
+///gives the same answer. backend_error: the model could not answer; the phone may retry.
+enum JobErrorKind {
+    BACKEND_ERROR,
+    INVALID_OUTPUT
+}
+
+final jobErrorKindValues = EnumValues({
+    "backend_error": JobErrorKind.BACKEND_ERROR,
+    "invalid_output": JobErrorKind.INVALID_OUTPUT
+});
+
+enum JobState {
+    COMPLETED,
+    FAILED,
+    PROCESSING,
+    QUEUED
+}
+
+final jobStateValues = EnumValues({
+    "completed": JobState.COMPLETED,
+    "failed": JobState.FAILED,
+    "processing": JobState.PROCESSING,
+    "queued": JobState.QUEUED
+});
+
+
+///Body of POST /v1/jobs: a summarize job the phone escalates to the Mac.
+class JobSubmission {
+    
+    ///The phone's job ID. Submitting the same ID and body again returns the existing job.
+    final String jobId;
+    final JobKind kind;
+    
+    ///Language code of the transcript (en, ta, ml, hi, ta-en, ml-en, hi-en), or null if unknown.
+    final String? language;
+    final String transcript;
+
+    JobSubmission({
+        required this.jobId,
+        required this.kind,
+        required this.language,
+        required this.transcript,
+    });
+
+    factory JobSubmission.fromJson(Map<String, dynamic> json) => JobSubmission(
+        jobId: json["jobId"],
+        kind: jobKindValues.map[json["kind"]]!,
+        language: json["language"],
+        transcript: json["transcript"],
+    );
+
+    Map<String, dynamic> toJson() => {
+        "jobId": jobId,
+        "kind": jobKindValues.reverse[kind],
+        "language": language,
+        "transcript": transcript,
+    };
+}
+
+enum JobKind {
+    SUMMARIZE
+}
+
+final jobKindValues = EnumValues({
+    "summarize": JobKind.SUMMARIZE
 });
 
 
