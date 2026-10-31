@@ -1,12 +1,15 @@
 import { mkdtempSync, rmSync } from "node:fs";
+import { request } from "node:https";
 import type { AddressInfo } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 import { type App, buildApp } from "../src/app.js";
+import { clientProof } from "../src/auth/proof.js";
 import { AuthStore } from "../src/auth/store.js";
 import type { InferenceBackend } from "../src/jobs/backend.js";
 import { JobStore } from "../src/jobs/store.js";
+import { type TlsIdentity, loadOrCreateIdentity } from "../src/tls/identity.js";
 
 /** A clock the test moves by hand. */
 export class TestClock {
@@ -24,6 +27,7 @@ export interface Gateway {
   clock: TestClock;
   logs: Record<string, unknown>[];
   dbPath: string;
+  tls: TlsIdentity;
   stop(): Promise<void>;
 }
 
@@ -35,10 +39,11 @@ export async function stopAll(): Promise<void> {
 
 /** Starts a real gateway on port 0 with a fresh SQLite file. */
 export async function startGateway(
-  options: { backend?: InferenceBackend; dbPath?: string } = {},
+  options: { backend?: InferenceBackend; dbPath?: string; tlsDir?: string } = {},
 ): Promise<Gateway> {
   const dir = mkdtempSync(join(tmpdir(), "gateway-"));
   const dbPath = options.dbPath ?? join(dir, "gateway.sqlite");
+  const tls = await loadOrCreateIdentity(options.tlsDir ?? join(dir, "tls"));
   const clock = new TestClock();
   const store = new JobStore(dbPath);
   const auth = new AuthStore(dbPath, clock.now);
@@ -48,6 +53,7 @@ export async function startGateway(
     store,
     auth,
     now: clock.now,
+    tls,
     ...(options.backend ? { backend: options.backend } : {}),
     logStream: { write: (line) => void logs.push(JSON.parse(line) as Record<string, unknown>) },
   });
@@ -61,40 +67,86 @@ export async function startGateway(
     store.close();
     auth.close();
   };
+  lastIdentity.set(`https://127.0.0.1:${String(port)}`, tls);
   cleanups.push(async () => {
     await stop();
     rmSync(dir, { recursive: true, force: true });
   });
-  return { url: `http://127.0.0.1:${String(port)}`, app, auth, clock, logs, dbPath, stop };
+  return { url: `https://127.0.0.1:${String(port)}`, app, auth, clock, logs, dbPath, tls, stop };
 }
 
-export async function call(
+/**
+ * An HTTPS request pinned to one certificate, as the phone makes it: the
+ * pinned certificate is the only trusted CA, and the fingerprint must match.
+ */
+export function call(
   url: string,
   method: string,
   path: string,
-  options: { body?: unknown; token?: string } = {},
-): Promise<{ status: number; json: unknown }> {
-  const headers: Record<string, string> = {};
-  if (options.body !== undefined) headers["content-type"] = "application/json";
+  options: {
+    body?: unknown;
+    token?: string;
+    pin?: TlsIdentity;
+    headers?: Record<string, string>;
+  } = {},
+): Promise<{
+  status: number;
+  json: unknown;
+  headers: Record<string, string | string[] | undefined>;
+}> {
+  const pin = options.pin ?? lastIdentity.get(url);
+  if (!pin) throw new Error(`no pinned certificate for ${url}`);
+  const { hostname, port } = new URL(url);
+  const headers: Record<string, string> = { ...options.headers };
+  const body = options.body === undefined ? undefined : JSON.stringify(options.body);
+  if (body !== undefined) headers["content-type"] = "application/json";
   if (options.token !== undefined) headers.authorization = `Bearer ${options.token}`;
-  const response = await fetch(`${url}${path}`, {
-    method,
-    headers,
-    ...(options.body !== undefined ? { body: JSON.stringify(options.body) } : {}),
+  return new Promise((resolve, reject) => {
+    const req = request(
+      {
+        hostname,
+        port,
+        path,
+        method,
+        headers,
+        ca: pin.cert,
+        checkServerIdentity: (_host, cert) =>
+          cert.fingerprint256.replaceAll(":", "").toLowerCase() === pin.fingerprint
+            ? undefined
+            : new Error("certificate fingerprint does not match the pin"),
+      },
+      (res) => {
+        let text = "";
+        res.setEncoding("utf8");
+        res.on("data", (chunk: string) => (text += chunk));
+        res.on("end", () => {
+          resolve({
+            status: res.statusCode ?? 0,
+            json: text === "" ? null : (JSON.parse(text) as unknown),
+            headers: res.headers,
+          });
+        });
+      },
+    );
+    req.on("error", reject);
+    req.end(body);
   });
-  return { status: response.status, json: await response.json() };
 }
+
+const lastIdentity = new Map<string, TlsIdentity>();
 
 /** Pairs a device through the HTTP API and returns its credential and a session token. */
 export async function pairDevice(
   gateway: Gateway,
   name = "OnePlus 11R",
 ): Promise<{ deviceId: string; deviceSecret: string; token: string }> {
-  const { code } = gateway.auth.createPairingCode();
+  const { code } = gateway.auth.createPairingCode(gateway.tls.fingerprint);
+  const proof = clientProof(code, gateway.tls.fingerprint);
   const paired = await call(gateway.url, "POST", "/v1/pairing", {
-    body: { code, deviceName: name },
+    body: { proof, deviceName: name },
   });
-  const credential = paired.json as { deviceId: string; deviceSecret: string };
+  const { deviceId, deviceSecret } = paired.json as { deviceId: string; deviceSecret: string };
+  const credential = { deviceId, deviceSecret };
   const session = await call(gateway.url, "POST", "/v1/sessions", { body: credential });
   return { ...credential, token: (session.json as { sessionToken: string }).sessionToken };
 }

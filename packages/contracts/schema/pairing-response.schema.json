@@ -7,7 +7,8 @@
   "additionalProperties": false,
   "required": [
     "deviceId",
-    "deviceSecret"
+    "deviceSecret",
+    "serverProof"
   ],
   "properties": {
     "deviceId": {
@@ -18,6 +19,11 @@
       "type": "string",
       "pattern": "^[A-Za-z0-9_-]{43}$",
       "description": "32 random bytes, base64url without padding."
+    },
+    "serverProof": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "HMAC-SHA256 with the pairing code as key over 'fieldnote-pair-v1|server|' + the fingerprint. The phone checks it before it trusts the response, then pins the fingerprint."
     }
   }
 }

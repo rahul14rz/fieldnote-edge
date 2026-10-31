@@ -10,8 +10,9 @@ Implemented so far:
 - Logs are structured JSON (pino). Each request log line carries a `correlationId`. The gateway takes the ID from the `x-request-id` request header if the header matches `^[A-Za-z0-9._-]{1,64}$`, otherwise it generates a UUID, and it returns the ID in the `x-request-id` response header.
 
 - Pairing and session tokens ([ADR 0009](../../docs/decisions/0009-pairing-and-sessions.md)). Every `/v1/jobs` request needs `Authorization: Bearer <session token>`.
+- HTTPS only, TLS 1.3, with a self-signed certificate created on first start in `$DATA_DIR/tls/`. Pairing proofs bind the code to the certificate fingerprint ([ADR 0010](../../docs/decisions/0010-tls-and-pinned-pairing.md)).
 
-Not implemented yet: a real inference backend (`INFERENCE_BACKEND=none` is the only value, so `POST /v1/jobs` answers 503), TLS, and mDNS discovery.
+Not implemented yet: a real inference backend (`INFERENCE_BACKEND=none` is the only value, so `POST /v1/jobs` answers 503), and mDNS discovery.
 
 ## Environment
 
@@ -41,10 +42,11 @@ pnpm --filter @fieldnote/gateway build
 PORT=8787 node services/gateway/dist/src/server.js
 ```
 
-In another terminal:
+In another terminal, from the repository root, pin the gateway's public key. The certificate is self-signed, so `-k` skips the CA check, and `--pinnedpubkey` still rejects any other key:
 
 ```bash
-curl -sS http://127.0.0.1:8787/health
+PIN=$(openssl x509 -in data/tls/gateway-cert.pem -pubkey -noout | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | base64)
+curl -sS -k --pinnedpubkey "sha256//$PIN" https://127.0.0.1:8787/health
 ```
 
 Expected response:
@@ -61,7 +63,7 @@ Build the gateway first. Then, on the Mac:
 node services/gateway/dist/src/cli.js pair
 ```
 
-The command prints a 10-character code that works once, for 5 minutes. List paired devices, and revoke one:
+The command prints a 10-character code that works once, for 5 minutes, and the start of the certificate fingerprint. The phone sends a proof derived from the code and the fingerprint, not the code itself. List paired devices, and revoke one:
 
 ```bash
 node services/gateway/dist/src/cli.js devices

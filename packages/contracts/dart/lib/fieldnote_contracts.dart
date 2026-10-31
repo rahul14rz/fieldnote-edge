@@ -296,26 +296,28 @@ class Participant {
 }
 
 
-///Body of POST /v1/pairing: the phone redeems a one-time pairing code.
+///Body of POST /v1/pairing. The phone never sends the pairing code itself; it sends a proof
+///that binds the code to the TLS certificate it connected to (see ADR 0010).
 class PairingRequest {
-    
-    ///Ten Crockford base32 characters shown on the Mac.
-    final String code;
     final String deviceName;
+    
+    ///Lowercase hex HMAC-SHA256 with the pairing code as key over 'fieldnote-pair-v1|client|' +
+    ///the certificate's SHA-256 fingerprint in lowercase hex.
+    final String proof;
 
     PairingRequest({
-        required this.code,
         required this.deviceName,
+        required this.proof,
     });
 
     factory PairingRequest.fromJson(Map<String, dynamic> json) => PairingRequest(
-        code: json["code"],
         deviceName: json["deviceName"],
+        proof: json["proof"],
     );
 
     Map<String, dynamic> toJson() => {
-        "code": code,
         "deviceName": deviceName,
+        "proof": proof,
     };
 }
 
@@ -327,20 +329,27 @@ class PairingResponse {
     
     ///32 random bytes, base64url without padding.
     final String deviceSecret;
+    
+    ///HMAC-SHA256 with the pairing code as key over 'fieldnote-pair-v1|server|' + the
+    ///fingerprint. The phone checks it before it trusts the response, then pins the fingerprint.
+    final String serverProof;
 
     PairingResponse({
         required this.deviceId,
         required this.deviceSecret,
+        required this.serverProof,
     });
 
     factory PairingResponse.fromJson(Map<String, dynamic> json) => PairingResponse(
         deviceId: json["deviceId"],
         deviceSecret: json["deviceSecret"],
+        serverProof: json["serverProof"],
     );
 
     Map<String, dynamic> toJson() => {
         "deviceId": deviceId,
         "deviceSecret": deviceSecret,
+        "serverProof": serverProof,
     };
 }
 

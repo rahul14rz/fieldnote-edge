@@ -1,5 +1,6 @@
 import { DatabaseSync } from "node:sqlite";
 
+import { clientProof, serverProof } from "./proof.js";
 import { hashSecret, newDeviceId, newPairingCode, newSecret } from "./tokens.js";
 
 export interface Device {
@@ -35,8 +36,9 @@ export class AuthStore {
     this.db.exec(`
       PRAGMA journal_mode = WAL;
       PRAGMA busy_timeout = 5000;
-      CREATE TABLE IF NOT EXISTS pairing_codes (
-        code_hash TEXT PRIMARY KEY,
+      CREATE TABLE IF NOT EXISTS pairing_offers (
+        proof_hash TEXT PRIMARY KEY,
+        server_proof TEXT NOT NULL,
         expires_at TEXT NOT NULL,
         used_at TEXT
       );
@@ -55,37 +57,45 @@ export class AuthStore {
     `);
   }
 
-  /** Creates a single-use pairing code. Returns the code; only its hash is stored. */
-  createPairingCode(): { code: string; expiresAt: string } {
+  /**
+   * Creates a single-use pairing code for the certificate with `fingerprint`.
+   * The code itself is not stored: only the hash of the proof a phone must
+   * send, and the proof the gateway answers with.
+   */
+  createPairingCode(fingerprint: string): { code: string; expiresAt: string } {
     const code = newPairingCode();
     const expiresAt = this.iso(this.now().getTime() + this.policy.pairingCodeTtlMs);
     this.db
-      .prepare("INSERT INTO pairing_codes (code_hash, expires_at) VALUES (?, ?)")
-      .run(hashSecret(code), expiresAt);
+      .prepare("INSERT INTO pairing_offers (proof_hash, server_proof, expires_at) VALUES (?, ?, ?)")
+      .run(hashSecret(clientProof(code, fingerprint)), serverProof(code, fingerprint), expiresAt);
     return { code, expiresAt };
   }
 
   /**
-   * Redeems a pairing code. Returns the new device credential, or null if the
-   * code is unknown, expired or already used. Marking the code used and
-   * creating the device happen in one transaction, so a code pairs once.
+   * Redeems a pairing proof. Returns the new device credential and the server
+   * proof, or null if the proof matches no unexpired, unused offer. Marking the
+   * offer used and creating the device happen in one transaction, so an offer
+   * pairs once.
    */
-  redeemPairingCode(
-    code: string,
+  redeemPairingProof(
+    proof: string,
     deviceName: string,
-  ): { deviceId: string; deviceSecret: string } | null {
+  ): { deviceId: string; deviceSecret: string; serverProof: string } | null {
     const nowIso = this.iso(this.now().getTime());
     this.db.exec("BEGIN IMMEDIATE");
     try {
-      const used = this.db
+      const offer = this.db
         .prepare(
-          "UPDATE pairing_codes SET used_at = ? WHERE code_hash = ? AND used_at IS NULL AND expires_at > ?",
+          "SELECT server_proof FROM pairing_offers WHERE proof_hash = ? AND used_at IS NULL AND expires_at > ?",
         )
-        .run(nowIso, hashSecret(code), nowIso);
-      if (Number(used.changes) !== 1) {
+        .get(hashSecret(proof), nowIso) as { server_proof: string } | undefined;
+      if (!offer) {
         this.db.exec("ROLLBACK");
         return null;
       }
+      this.db
+        .prepare("UPDATE pairing_offers SET used_at = ? WHERE proof_hash = ?")
+        .run(nowIso, hashSecret(proof));
       const deviceId = newDeviceId();
       const deviceSecret = newSecret();
       this.db
@@ -94,7 +104,7 @@ export class AuthStore {
         )
         .run(deviceId, deviceName, hashSecret(deviceSecret), nowIso);
       this.db.exec("COMMIT");
-      return { deviceId, deviceSecret };
+      return { deviceId, deviceSecret, serverProof: offer.server_proof };
     } catch (error) {
       this.db.exec("ROLLBACK");
       throw error;

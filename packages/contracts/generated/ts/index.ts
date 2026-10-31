@@ -91,14 +91,16 @@ export interface Participant {
 }
 
 /**
- * Body of POST /v1/pairing: the phone redeems a one-time pairing code.
+ * Body of POST /v1/pairing. The phone never sends the pairing code itself; it sends a proof
+ * that binds the code to the TLS certificate it connected to (see ADR 0010).
  */
 export interface PairingRequest {
-    /**
-     * Ten Crockford base32 characters shown on the Mac.
-     */
-    code:       string;
     deviceName: string;
+    /**
+     * Lowercase hex HMAC-SHA256 with the pairing code as key over 'fieldnote-pair-v1|client|' +
+     * the certificate's SHA-256 fingerprint in lowercase hex.
+     */
+    proof: string;
 }
 
 /**
@@ -111,6 +113,11 @@ export interface PairingResponse {
      * 32 random bytes, base64url without padding.
      */
     deviceSecret: string;
+    /**
+     * HMAC-SHA256 with the pairing code as key over 'fieldnote-pair-v1|server|' + the
+     * fingerprint. The phone checks it before it trusts the response, then pins the fingerprint.
+     */
+    serverProof: string;
 }
 
 /**

@@ -2,18 +2,18 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://github.com/rahul14rz/fieldnote-edge/contracts/pairing-request.schema.json",
   "title": "PairingRequest",
-  "description": "Body of POST /v1/pairing: the phone redeems a one-time pairing code.",
+  "description": "Body of POST /v1/pairing. The phone never sends the pairing code itself; it sends a proof that binds the code to the TLS certificate it connected to (see ADR 0010).",
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "code",
+    "proof",
     "deviceName"
   ],
   "properties": {
-    "code": {
+    "proof": {
       "type": "string",
-      "pattern": "^[0-9A-HJKMNP-TV-Z]{10}$",
-      "description": "Ten Crockford base32 characters shown on the Mac."
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "Lowercase hex HMAC-SHA256 with the pairing code as key over 'fieldnote-pair-v1|client|' + the certificate's SHA-256 fingerprint in lowercase hex."
     },
     "deviceName": {
       "type": "string",
