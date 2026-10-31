@@ -13,6 +13,9 @@ describe("parseEnv", () => {
       LOG_LEVEL: "info",
       DATA_DIR: "./data",
       INFERENCE_BACKEND: "none",
+      INFERENCE_TIMEOUT_MS: 600000,
+      INFERENCE_MAX_OUTPUT_TOKENS: 2048,
+      MDNS: "auto",
     });
   });
 
@@ -25,6 +28,9 @@ describe("parseEnv", () => {
       LOG_LEVEL: "debug",
       DATA_DIR: "/var/fieldnote",
       INFERENCE_BACKEND: "none",
+      INFERENCE_TIMEOUT_MS: 600000,
+      INFERENCE_MAX_OUTPUT_TOKENS: 2048,
+      MDNS: "auto",
     });
   });
 
